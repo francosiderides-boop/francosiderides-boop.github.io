@@ -1,15 +1,15 @@
 ---
-titulo: The Otarios — "A mis casi 40"
+titulo: The Otarios — "A mis casi cuarenta"
 slug: the-otarios-a-mis-casi-40
-anio: 2026                   # COMPLETAR: confirmar el año
+anio: 2025
 categorias: [Videoclips]
 rol: Edición
 cliente: The Otarios
 duracion: ""                 # COMPLETAR
 destacado: false
-publicado: false             # Borrador hasta confirmar el año
+publicado: true
 
-sinopsis: Edición del videoclip "A mis casi 40" de The Otarios.
+sinopsis: Edición del videoclip "A mis casi cuarenta" de The Otarios, estrenado el 7 de marzo de 2025.
 
 video: https://www.youtube.com/watch?v=ql0nD59RrmQ
 

@@ -10,7 +10,7 @@ categorias:
 rol: "" # COMPLETAR (ej. Director · Editor)
 cliente: "" # COMPLETAR
 duracion: "" # COMPLETAR (ej. 3:42 o 14 min)
-destacado: true
+destacado: false
 publicado: true
 
 sinopsis: "Edición de coproducción entre McDonald's y La Voz del Interior. Se
