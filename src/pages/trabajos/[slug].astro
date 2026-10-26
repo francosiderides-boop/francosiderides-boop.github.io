@@ -5,6 +5,8 @@ import VideoEmbebido from '../../components/VideoEmbebido.astro';
 import Imagen from '../../components/Imagen.astro';
 import Galeria from '../../components/Galeria.astro';
 import FichaTecnica from '../../components/FichaTecnica.astro';
+import TarjetaInstagram from '../../components/TarjetaInstagram.astro';
+import { urlEmbebida } from '../../lib/video';
 import { obtenerProyectos, textoCategorias, type Proyecto } from '../../lib/proyectos';
 import { carpetaDe, datosImagen, imagenParaCompartir } from '../../lib/imagenes';
 
@@ -35,6 +37,8 @@ const carpeta = carpetaDe(proyecto.filePath);
 const miniatura = datosImagen(data.miniatura).src;
 const vertical = data.formato === 'vertical';
 // En trabajos verticales, la portada del reproductor es el primer still (también vertical)
+// Los videos de Instagram se muestran como portada con botón (sin el reproductor de Instagram)
+const soloInstagram = data.video.length > 0 && data.video.every((u) => urlEmbebida(u)?.plataforma === 'Instagram');
 const posterVideo = vertical && data.stills.length ? datosImagen(data.stills[0]).src : miniatura;
 const hayOtros = anterior.id !== proyecto.id;
 // Solo se muestra la sección "Sinopsis" si hay texto
@@ -64,7 +68,9 @@ const descripcion = data.sinopsis || `${data.titulo} (${data.anio}) — ${textoC
       <h1 class="mb-7 font-display text-5xl leading-[.98] font-semibold md:text-[72px] lg:text-[104px]">{data.titulo}</h1>
 
       {
-        // Varios videos (ej. partes de una serie): uno al lado del otro
+        soloInstagram ? (
+          <TarjetaInstagram urls={data.video} titulo={data.titulo} poster={miniatura} carpeta={carpeta} />
+        ) : // Varios videos (ej. partes de una serie): uno al lado del otro
         data.video.length > 1 ? (
           <ol class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
             {data.video.map((url, i) => (

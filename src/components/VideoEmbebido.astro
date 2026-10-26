@@ -13,8 +13,6 @@ interface Props {
 const { url, titulo, poster, carpeta, duracion, vertical = false } = Astro.props;
 const embed = urlEmbebida(url);
 const etiqueta = embed?.plataforma === 'archivo' ? 'Video' : embed?.plataforma;
-// El reproductor de Instagram suma encabezado y pie al video: necesita un marco más alto
-const instagram = embed?.plataforma === 'Instagram';
 ---
 
 <!--
@@ -24,11 +22,7 @@ const instagram = embed?.plataforma === 'Instagram';
 <div
   class:list={[
     'video relative overflow-hidden rounded-ui bg-bg2',
-    instagram
-      ? 'instagram mx-auto aspect-[3/4] w-full max-w-[min(100%,420px)] bg-white'
-      : vertical
-        ? 'mx-auto aspect-[9/16] w-full max-w-[min(100%,calc(80svh*9/16))]'
-        : 'aspect-video',
+    vertical ? 'mx-auto aspect-[9/16] w-full max-w-[min(100%,calc(80svh*9/16))]' : 'aspect-video',
   ]}
   data-src={embed?.src}
   data-tipo={embed?.plataforma === 'archivo' ? 'archivo' : 'iframe'}
@@ -93,24 +87,4 @@ const instagram = embed?.plataforma === 'Instagram';
     });
   });
 
-  // Instagram avisa la altura de su reproductor: el marco se ajusta para no dejar espacio en blanco
-  window.addEventListener('message', (e) => {
-    if (e.origin !== 'https://www.instagram.com') return;
-    let datos: { type?: string; details?: { height?: number } };
-    try {
-      datos = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-    } catch {
-      return;
-    }
-    const alto = datos?.type === 'MEASURE' ? Number(datos.details?.height) : 0;
-    if (!alto) return;
-    document.querySelectorAll<HTMLIFrameElement>('.video.instagram iframe').forEach((iframe) => {
-      if (iframe.contentWindow !== e.source) return;
-      const caja = iframe.parentElement!;
-      // Mientras carga, Instagram puede informar una altura menor: nunca se achica por debajo de 3:4
-      const minimo = (caja.offsetWidth * 4) / 3;
-      caja.style.aspectRatio = 'auto';
-      caja.style.height = `${Math.max(alto, minimo)}px`;
-    });
-  });
 </script>

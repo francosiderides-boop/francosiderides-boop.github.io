@@ -1,0 +1,56 @@
+---
+import Imagen from './Imagen.astro';
+
+interface Props {
+  urls: string[];
+  titulo: string;
+  poster: string;
+  carpeta: string;
+}
+const { urls, titulo, poster, carpeta } = Astro.props;
+---
+
+<!--
+  Los videos publicados en Instagram no se embeben: su reproductor suma la interfaz de
+  Instagram (perfil, "me gusta", comentarios). En su lugar se muestra la portada con un
+  botón que abre el video en Instagram.
+-->
+<div class="relative overflow-hidden rounded-ui bg-bg2">
+  <!-- En teléfono los botones van debajo de la imagen; desde tablet, encima -->
+  <div class="relative aspect-video">
+  <Imagen
+    src={poster}
+    carpeta={carpeta}
+    alt=""
+    sizes="(min-width: 1440px) 1360px, 100vw"
+    clase="absolute inset-0 size-full object-cover"
+    prioridad
+  />
+  <div class="absolute inset-0 hidden bg-[linear-gradient(180deg,rgba(8,8,9,.15)_0%,rgba(8,8,9,.55)_55%,rgba(8,8,9,.85)_100%)] md:block"></div>
+  </div>
+  <div class="flex flex-col items-center gap-4 p-5 text-center text-fg md:absolute md:inset-x-0 md:bottom-0 md:p-8 md:text-[#ECEFF1]">
+    <p class="flex items-center gap-2 text-[15px] font-medium tracking-[.08em] uppercase">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle>
+      </svg>
+      {urls.length > 1 ? `Serie de ${urls.length} videos en Instagram` : 'Video publicado en Instagram'}
+    </p>
+    <div class="flex flex-wrap justify-center gap-3">
+      {
+        urls.map((url, i) => (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener"
+            class="btn-primario"
+            aria-label={urls.length > 1 ? `Ver la parte ${i + 1} de ${titulo} en Instagram (se abre en otra pestaña)` : `Ver ${titulo} en Instagram (se abre en otra pestaña)`}
+          >
+            <span aria-hidden="true">▶</span>
+            {urls.length > 1 ? `Parte ${i + 1}` : 'Ver en Instagram'}
+            <span aria-hidden="true">↗</span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</div>
