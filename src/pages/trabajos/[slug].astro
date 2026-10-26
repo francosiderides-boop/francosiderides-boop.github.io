@@ -64,9 +64,26 @@ const descripcion = data.sinopsis || `${data.titulo} (${data.anio}) — ${textoC
       <h1 class="mb-7 font-display text-5xl leading-[.98] font-semibold md:text-[72px] lg:text-[104px]">{data.titulo}</h1>
 
       {
-        data.video ? (
+        // Varios videos (ej. partes de una serie): uno al lado del otro
+        data.video.length > 1 ? (
+          <ol class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+            {data.video.map((url, i) => (
+              <li>
+                <p class="eyebrow mb-3 text-center">Parte {i + 1}</p>
+                <VideoEmbebido
+                  url={url}
+                  titulo={`${data.titulo} — parte ${i + 1}`}
+                  poster=""
+                  {/* sin portada repetida: fondo neutro del diseño */}
+                  carpeta={carpeta}
+                  vertical={vertical}
+                />
+              </li>
+            ))}
+          </ol>
+        ) : data.video.length === 1 ? (
           <VideoEmbebido
-            url={data.video}
+            url={data.video[0]}
             titulo={data.titulo}
             poster={posterVideo}
             carpeta={carpeta}

@@ -16,7 +16,10 @@ publicado: true
 sinopsis: "Guion, filmación y edición de 3 reels partes de una colaboración
   entre La Voz del Interior y Cines Dino."
 
-video: "" # COMPLETAR si hay video en Vimeo o YouTube
+video:
+  - https://www.instagram.com/p/DXXNC2ikdgt/
+  - https://www.instagram.com/p/DXu0hyqhnhs/
+  - https://www.instagram.com/p/DYN7uzFBQX_/
 
 miniatura: "/proyectos/produccion-de-reels-para-cines-dino-parte-1-2-y-3/portada.webp"
 stills: []

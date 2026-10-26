@@ -28,8 +28,12 @@ const proyectos = defineCollection({
     rol: texto,
     cliente: texto,
     sinopsis: texto,
-    // Enlace de Vimeo/YouTube o un archivo de video propio (ej. /proyectos/slug/video.mp4)
-    video: texto,
+    // Enlace de Vimeo/YouTube/Instagram o un archivo propio (ej. /proyectos/slug/video.mp4).
+    // Para varios videos (ej. una serie en partes) se puede poner una lista.
+    video: z
+      .union([z.string(), z.array(z.string())])
+      .nullish()
+      .transform((v) => (Array.isArray(v) ? v : v ? [v] : []).filter(Boolean)),
     // "vertical" para reels y videos 9:16: cambia el reproductor y la galería
     formato: z.enum(['horizontal', 'vertical']).default('horizontal'),
     duracion: texto,
