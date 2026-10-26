@@ -7,17 +7,17 @@ slug: "realizacion-de-reset-materno-temporada-1-y-2"
 anio: 2026
 categorias:
   - Institucional
-rol: "" # COMPLETAR (ej. Director · Editor)
-cliente: "" # COMPLETAR
+rol: "Dirección audiovisual"
+cliente: "Protectia · La Voz del Interior"
 duracion: "" # COMPLETAR (ej. 3:42 o 14 min)
 destacado: true
 publicado: true
 
-sinopsis: "Encargado de la realización y supervisión audiovisual del proyecto.
-  Desde la puesta en escena, iluminación, sonido y filmación; montaje y post
-  producción de color."
+sinopsis: "Podcast sobre maternidad en el que madres influencers y profesionales
+  cuentan cómo readaptaron su vida profesional después de la maternidad. Un
+  proyecto colaborativo entre Protectia y La Voz del Interior."
 
-video: "" # COMPLETAR si hay video en Vimeo o YouTube
+video: "https://www.youtube.com/watch?v=SXk2AH3_wvQ"
 
 miniatura: "/proyectos/realizacion-de-reset-materno-temporada-1-y-2/portada.webp"
 stills: []
@@ -32,3 +32,5 @@ behance:
   url: "https://www.behance.net/gallery/250059445/Realizacion-de-Reset-Materno-%2\
     8TEMPORADA-1-Y-2%29"
 ---
+
+Estuve a cargo de la dirección audiovisual del proyecto: puesta en escena, iluminación, puesta de cámara y postproducción.
