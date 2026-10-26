@@ -19,8 +19,8 @@ const activo = (href: string) => (href === '/' ? ruta === '/' : ruta.startsWith(
   </a>
 
   <!-- Menú horizontal: tablet y computadora -->
-  <nav aria-label="Principal" class="hidden items-center gap-4 md:flex lg:gap-9">
-    <ul class="flex items-center gap-5 lg:gap-9">
+  <nav aria-label="Principal" class="hidden items-center gap-4 md:flex lg:gap-6 xl:gap-9">
+    <ul class="flex items-center gap-5 lg:gap-6 xl:gap-9">
       {
         navegacion.map((item) => (
           <li>
@@ -28,7 +28,7 @@ const activo = (href: string) => (href === '/' ? ruta === '/' : ruta.startsWith(
               href={item.href}
               aria-current={activo(item.href) ? 'page' : undefined}
               class:list={[
-                '-mb-0.5 flex min-h-12 items-center border-b-2 px-1 font-semibold transition-colors',
+                '-mb-0.5 flex min-h-12 items-center border-b-2 px-1 font-semibold whitespace-nowrap transition-colors',
                 activo(item.href) ? 'border-accent text-fg' : 'border-transparent text-muted hover:text-fg',
               ]}
             >
@@ -38,9 +38,9 @@ const activo = (href: string) => (href === '/' ? ruta === '/' : ruta.startsWith(
         ))
       }
     </ul>
-    <ToggleTema clase="min-h-12 min-w-12 px-3 text-[15px] lg:px-4" claseTexto="sr-only lg:not-sr-only" />
+    <ToggleTema clase="min-h-12 min-w-12 px-3 text-[15px] whitespace-nowrap xl:px-4" claseTexto="sr-only xl:not-sr-only" />
     <!-- Botón de contacto fijo en computadora -->
-    <a href="/contacto/" class="btn-primario hidden min-h-12 px-6 lg:inline-flex">Contactame</a>
+    <a href="/contacto/" class="btn-primario hidden min-h-12 px-6 whitespace-nowrap lg:inline-flex">Contactame</a>
   </nav>
 
   <!-- Menú hamburguesa: teléfono -->

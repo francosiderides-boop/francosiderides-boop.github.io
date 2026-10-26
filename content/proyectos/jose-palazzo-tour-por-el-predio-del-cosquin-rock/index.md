@@ -15,7 +15,7 @@ publicado: true
 
 sinopsis: "" # COMPLETAR
 
-video: "" # COMPLETAR si hay video en Vimeo o YouTube
+video: "https://www.youtube.com/watch?v=m9n-tNNhX5M"
 
 miniatura: "/proyectos/jose-palazzo-tour-por-el-predio-del-cosquin-rock/portada.webp"
 stills: []

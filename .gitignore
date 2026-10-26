@@ -7,3 +7,6 @@ dist/
 
 # Configuración local del editor/vista previa
 .claude/
+
+# Copia local de la rama publicada (la crea npm run publicar)
+.publicar/

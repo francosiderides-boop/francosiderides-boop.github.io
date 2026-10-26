@@ -5,8 +5,10 @@ interface Props {
   stills: (string | { src: string; alt?: string })[];
   carpeta: string;
   titulo: string;
+  /** Stills verticales (9:16): grilla de más columnas y sin la primera imagen panorámica */
+  vertical?: boolean;
 }
-const { stills, carpeta, titulo } = Astro.props;
+const { stills, carpeta, titulo, vertical = false } = Astro.props;
 
 const imagenes = (
   await Promise.all(
@@ -25,9 +27,14 @@ const imagenes = (
       <h2 id="titulo-stills" class="mb-5 font-display text-[32px] font-semibold">
         Stills
       </h2>
-      <ul class="galeria grid grid-cols-1 gap-7 md:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-9">
+      <ul
+        class:list={[
+          'galeria grid',
+          vertical ? 'grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4 lg:gap-6' : 'grid-cols-1 gap-7 md:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-9',
+        ]}
+      >
         {imagenes.map((img, i) => (
-          <li class:list={[i === 0 && 'md:col-span-2 lg:col-span-3']}>
+          <li class:list={[i === 0 && !vertical && 'md:col-span-2 lg:col-span-3']}>
             <button
               type="button"
               data-indice={i}
@@ -40,7 +47,13 @@ const imagenes = (
               <img
                 src={img.src}
                 srcset={img.srcset || undefined}
-                sizes={i === 0 ? '(min-width: 1440px) 1360px, 100vw' : '(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw'}
+                sizes={
+                  vertical
+                    ? '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw'
+                    : i === 0
+                      ? '(min-width: 1440px) 1360px, 100vw'
+                      : '(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw'
+                }
                 width={img.width}
                 height={img.height}
                 alt=""
@@ -48,7 +61,7 @@ const imagenes = (
                 decoding="async"
                 class:list={[
                   'w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]',
-                  i === 0 ? 'aspect-[2.39/1]' : 'aspect-video',
+                  vertical ? 'aspect-[9/16]' : i === 0 ? 'aspect-[2.39/1]' : 'aspect-video',
                 ]}
               />
             </button>

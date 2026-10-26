@@ -8,21 +8,31 @@ interface Props {
   poster: string;
   carpeta: string;
   duracion?: string;
+  vertical?: boolean;
 }
-const { url, titulo, poster, carpeta, duracion } = Astro.props;
+const { url, titulo, poster, carpeta, duracion, vertical = false } = Astro.props;
 const embed = urlEmbebida(url);
+const etiqueta = embed?.plataforma === 'archivo' ? 'Video' : embed?.plataforma;
 ---
 
 <!--
-  Proporción 16:9 fluida. El reproductor de Vimeo/YouTube recién se carga
-  al tocar o hacer clic: hasta entonces solo se descarga la miniatura.
+  Proporción fluida: 16:9 o 9:16 (vertical). El video recién se carga al tocar
+  o hacer clic: hasta entonces solo se descarga la imagen de portada.
 -->
-<div class="video relative aspect-video overflow-hidden rounded-ui bg-bg2" data-src={embed?.src} data-titulo={titulo}>
+<div
+  class:list={[
+    'video relative overflow-hidden rounded-ui bg-bg2',
+    vertical ? 'mx-auto aspect-[9/16] w-full max-w-[min(100%,calc(80svh*9/16))]' : 'aspect-video',
+  ]}
+  data-src={embed?.src}
+  data-tipo={embed?.plataforma === 'archivo' ? 'archivo' : 'iframe'}
+  data-titulo={titulo}
+>
   <Imagen
     src={poster}
     carpeta={carpeta}
     alt=""
-    sizes="(min-width: 1440px) 1360px, 100vw"
+    sizes={vertical ? '(min-width: 768px) 480px, 100vw' : '(min-width: 1440px) 1360px, 100vw'}
     clase="absolute inset-0 size-full object-cover"
     prioridad
   />
@@ -31,7 +41,7 @@ const embed = urlEmbebida(url);
       <button
         type="button"
         class="group absolute inset-0 flex items-center justify-center bg-black/25 transition-colors hover:bg-black/10"
-        aria-label={`Reproducir video: ${titulo} (${embed.plataforma})`}
+        aria-label={`Reproducir video: ${titulo}`}
       >
         <span
           aria-hidden="true"
@@ -40,7 +50,7 @@ const embed = urlEmbebida(url);
           ▶
         </span>
         <span class="absolute right-4 bottom-3.5 left-4 flex justify-between text-sm font-medium text-[#C3CBD0]">
-          <span>{embed.plataforma}</span>
+          <span>{etiqueta}</span>
           {duracion && <span>{duracion}</span>}
         </span>
       </button>
@@ -53,14 +63,27 @@ const embed = urlEmbebida(url);
 <script>
   document.querySelectorAll<HTMLElement>('.video[data-src]').forEach((caja) => {
     caja.querySelector('button')?.addEventListener('click', () => {
-      const iframe = document.createElement('iframe');
-      iframe.src = caja.dataset.src!;
-      iframe.title = `Video: ${caja.dataset.titulo}`;
-      iframe.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
-      iframe.allowFullscreen = true;
-      iframe.className = 'absolute inset-0 size-full border-0';
-      caja.replaceChildren(iframe);
-      iframe.focus();
+      let reproductor: HTMLVideoElement | HTMLIFrameElement;
+      if (caja.dataset.tipo === 'archivo') {
+        // Video propio: reproductor del navegador
+        const video = document.createElement('video');
+        video.src = caja.dataset.src!;
+        video.controls = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.setAttribute('aria-label', `Video: ${caja.dataset.titulo}`);
+        reproductor = video;
+      } else {
+        const iframe = document.createElement('iframe');
+        iframe.src = caja.dataset.src!;
+        iframe.title = `Video: ${caja.dataset.titulo}`;
+        iframe.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
+        iframe.allowFullscreen = true;
+        reproductor = iframe;
+      }
+      reproductor.className = 'absolute inset-0 size-full border-0 bg-black object-contain';
+      caja.replaceChildren(reproductor);
+      reproductor.focus();
     });
   });
 </script>

@@ -2,8 +2,10 @@
  * Convierte un enlace de YouTube o Vimeo en la dirección del reproductor embebido.
  * Usa las versiones que no dejan cookies de seguimiento.
  */
-export function urlEmbebida(url: string): { plataforma: 'YouTube' | 'Vimeo'; src: string } | null {
+export function urlEmbebida(url: string): { plataforma: 'YouTube' | 'Vimeo' | 'archivo'; src: string } | null {
   if (!url) return null;
+  // Archivo de video propio guardado en /public
+  if (/^\/[^/].*\.(mp4|webm|mov)$/i.test(url)) return { plataforma: 'archivo', src: url };
   let u: URL;
   try {
     u = new URL(url);

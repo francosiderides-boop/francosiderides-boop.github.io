@@ -15,7 +15,7 @@ publicado: true
 
 sinopsis: "" # COMPLETAR
 
-video: "" # COMPLETAR si hay video en Vimeo o YouTube
+video: "https://www.youtube.com/watch?v=fwZimLORTLE"
 
 miniatura: "/proyectos/tres-jovenes-un-nino-y-una-vaca/portada.webp"
 stills: []

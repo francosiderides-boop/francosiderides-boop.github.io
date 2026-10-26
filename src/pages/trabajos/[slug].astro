@@ -33,6 +33,9 @@ const { data } = proyecto;
 const { Content } = await render(proyecto);
 const carpeta = carpetaDe(proyecto.filePath);
 const miniatura = datosImagen(data.miniatura).src;
+const vertical = data.formato === 'vertical';
+// En trabajos verticales, la portada del reproductor es el primer still (también vertical)
+const posterVideo = vertical && data.stills.length ? datosImagen(data.stills[0]).src : miniatura;
 const hayOtros = anterior.id !== proyecto.id;
 // Solo se muestra la sección "Sinopsis" si hay texto
 const hayTexto = !!data.sinopsis || proyecto.body?.trim();
@@ -62,7 +65,14 @@ const descripcion = data.sinopsis || `${data.titulo} (${data.anio}) — ${textoC
 
       {
         data.video ? (
-          <VideoEmbebido url={data.video} titulo={data.titulo} poster={miniatura} carpeta={carpeta} duracion={data.duracion} />
+          <VideoEmbebido
+            url={data.video}
+            titulo={data.titulo}
+            poster={posterVideo}
+            carpeta={carpeta}
+            duracion={data.duracion}
+            vertical={vertical}
+          />
         ) : (
           <Imagen
             src={miniatura}
@@ -88,7 +98,7 @@ const descripcion = data.sinopsis || `${data.titulo} (${data.anio}) — ${textoC
         <FichaTecnica proyecto={proyecto} />
       </div>
 
-      <Galeria stills={data.stills} carpeta={carpeta} titulo={data.titulo} />
+      <Galeria stills={data.stills} carpeta={carpeta} titulo={data.titulo} vertical={vertical} />
 
       {
         hayOtros && (

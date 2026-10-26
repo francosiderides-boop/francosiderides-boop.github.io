@@ -15,7 +15,7 @@ publicado: true
 
 sinopsis: "Filmación y edición de una coproducción de PedidosYa con La Voz del Interior."
 
-video: "" # COMPLETAR si hay video en Vimeo o YouTube
+video: "https://www.youtube.com/watch?v=eJbliO1tHak"
 
 miniatura: "/proyectos/produccion-para-pedidosya/portada.webp"
 stills: []

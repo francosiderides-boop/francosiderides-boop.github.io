@@ -18,7 +18,7 @@ sinopsis: "Edición de coproducción entre McDonald's y La Voz del Interior. Se
   implementaron recursos de Motion Graphics para complementar la información de
   manera didáctica."
 
-video: "" # COMPLETAR si hay video en Vimeo o YouTube
+video: "https://www.youtube.com/watch?v=L7iHfODm7vo"
 
 miniatura: "/proyectos/edicion-de-produccion-para-mcdonald-s/portada.webp"
 stills: []

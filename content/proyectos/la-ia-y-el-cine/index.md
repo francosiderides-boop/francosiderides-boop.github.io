@@ -9,16 +9,24 @@ categorias:
   - Documental
 rol: "" # COMPLETAR (ej. Director · Editor)
 cliente: "" # COMPLETAR
-duracion: "" # COMPLETAR (ej. 3:42 o 14 min)
+duracion: "2:27"
 destacado: false
 publicado: true
 
 sinopsis: "" # COMPLETAR
 
-video: "" # COMPLETAR si hay video en Vimeo o YouTube
+video: "/proyectos/la-ia-y-el-cine/video.mp4"
 
 miniatura: "/proyectos/la-ia-y-el-cine/portada.webp"
-stills: []
+stills:
+  - src: ./still-1.jpg
+    alt: El presentador habla a cámara en un escritorio con lámpara
+  - src: ./still-2.jpg
+    alt: Captura de una aplicación que genera música con IA
+  - src: ./still-3.jpg
+    alt: Collage en blanco y negro con Guillermo del Toro
+  - src: ./still-4.jpg
+    alt: Collage con Tom Hanks y una cita sobre la tecnología
 
 ficha:
   camara: "" # COMPLETAR
@@ -28,4 +36,5 @@ ficha:
 behance:
   id: "236030433"
   url: "https://www.behance.net/gallery/236030433/LA-IA-Y-EL-CINE"
+formato: vertical
 ---
