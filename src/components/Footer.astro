@@ -1,0 +1,27 @@
+---
+import { sitio, enlaceEmail } from '../lib/sitio';
+const anio = new Date().getFullYear();
+---
+
+<footer class="pad-x border-t border-line pt-8 pb-28 text-muted lg:pb-10">
+  <div class="contenedor flex flex-col gap-6 md:flex-row md:flex-wrap md:items-center md:justify-between">
+    <p>© {anio} {sitio.nombre} — {sitio.especialidad}</p>
+    <ul class="flex flex-wrap gap-x-5 gap-y-1" aria-label="Redes sociales">
+      {
+        sitio.redes.map((red) => (
+          <li>
+            <a href={red.url} target="_blank" rel="noopener me" class="inline-flex min-h-12 items-center hover:text-fg">
+              {red.nombre}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p>
+      {sitio.ciudad} ·{' '}
+      <a href={enlaceEmail()} class="inline-flex min-h-12 items-center underline-offset-4 hover:text-fg hover:underline"
+        >{sitio.contacto.email}</a
+      >
+    </p>
+  </div>
+</footer>

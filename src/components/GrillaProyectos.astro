@@ -1,0 +1,16 @@
+---
+import TarjetaProyecto from './TarjetaProyecto.astro';
+import type { Proyecto } from '../lib/proyectos';
+
+interface Props {
+  proyectos: Proyecto[];
+  nivel?: 'h2' | 'h3';
+  id?: string;
+}
+const { proyectos, nivel, id } = Astro.props;
+---
+
+<!-- 1 columna en teléfono, 2 en tablet, 3 en computadora -->
+<div id={id} class="grid grid-cols-1 gap-7 md:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-9">
+  {proyectos.map((p, i) => <TarjetaProyecto proyecto={p} nivel={nivel} prioridad={i === 0} />)}
+</div>

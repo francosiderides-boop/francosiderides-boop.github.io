@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import Imagen from '../components/Imagen.astro';
+import { sitio } from '../lib/sitio';
+import { imagenParaCompartir } from '../lib/imagenes';
+
+const { sobreMi } = sitio;
+---
+
+<Base
+  titulo="Sobre mí"
+  descripcion={sobreMi.parrafos[0]}
+  imagen={await imagenParaCompartir(sobreMi.foto, '/config')}
+>
+  <div class="pad-x pt-8 pb-[72px] md:pt-14 md:pb-24 lg:pt-[72px] lg:pb-[140px]">
+    <div class="contenedor">
+      <div class="grid grid-cols-1 items-start gap-12 md:grid-cols-2 md:gap-14 lg:gap-20">
+        <Imagen
+          src={sobreMi.foto}
+          carpeta="/config"
+          alt={sobreMi.altFoto}
+          sizes="(min-width: 768px) 50vw, 100vw"
+          clase="aspect-[4/5] w-full max-w-[560px] rounded-ui object-cover object-[50%_20%]"
+          prioridad
+        />
+        <div>
+          <p class="eyebrow mb-3">Sobre mí</p>
+          <h1 class="mb-6 font-display text-5xl leading-[.98] font-semibold md:text-[72px] lg:text-[104px]">
+            {sobreMi.titulo}
+          </h1>
+          {
+            sobreMi.parrafos.map((p) => (
+              <p class="mb-4 max-w-[560px] leading-relaxed text-muted md:text-[17px] lg:text-lg">{p}</p>
+            ))
+          }
+          <a href="/contacto/" class="btn-primario mt-3">{sobreMi.boton}</a>
+        </div>
+      </div>
+
+      <div class="mt-12 grid grid-cols-1 gap-12 border-t border-line pt-8 md:mt-14 md:grid-cols-3 md:gap-10 lg:mt-20 lg:gap-20">
+        {
+          sobreMi.columnas.map((col) => (
+            <section>
+              <h2 class="mb-4 font-display text-[30px] font-semibold">{col.titulo}</h2>
+              <ul>
+                {col.items.map((item) => (
+                  <li class="border-b border-line py-3 leading-snug md:text-[17px] lg:text-lg">{item}</li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</Base>

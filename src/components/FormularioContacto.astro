@@ -1,0 +1,109 @@
+---
+import { sitio } from '../lib/sitio';
+const { formspreeId, tiposDeProyecto, email } = sitio.contacto;
+// Si no hay ID de Formspree configurado, el formulario abre el programa de correo como alternativa
+const accion = formspreeId ? `https://formspree.io/f/${formspreeId}` : '';
+---
+
+<div class="formulario-contacto">
+  <form
+    action={accion || undefined}
+    method="POST"
+    novalidate
+    data-email={email}
+    class="flex flex-col gap-5"
+  >
+    <div class="flex flex-col gap-2">
+      <label for="f-nombre" class="font-semibold">Nombre</label>
+      <input id="f-nombre" name="nombre" type="text" required autocomplete="name" class="campo h-[52px]" aria-describedby="e-nombre" />
+      <p id="e-nombre" class="error hidden text-[15px] text-error">Escribí tu nombre.</p>
+    </div>
+    <div class="flex flex-col gap-2">
+      <label for="f-email" class="font-semibold">Email</label>
+      <input id="f-email" name="email" type="email" required autocomplete="email" inputmode="email" class="campo h-[52px]" aria-describedby="e-email" />
+      <p id="e-email" class="error hidden text-[15px] text-error">Escribí un email válido (ej. nombre@correo.com).</p>
+    </div>
+    <fieldset class="flex flex-col gap-2">
+      <legend class="mb-2 font-semibold">Tipo de proyecto</legend>
+      <div class="flex flex-wrap gap-2">
+        {
+          tiposDeProyecto.map((t, i) => (
+            <label class="tipo relative">
+              <input type="radio" name="tipo" value={t} checked={i === 0} class="peer sr-only" />
+              <span class="flex min-h-12 cursor-pointer items-center rounded-ui border border-line px-[18px] font-semibold transition-colors peer-checked:border-accent peer-checked:bg-accent peer-checked:text-onaccent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent">
+                {t}
+              </span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+    <div class="flex flex-col gap-2">
+      <label for="f-mensaje" class="font-semibold">Mensaje</label>
+      <textarea id="f-mensaje" name="mensaje" required rows="5" minlength="10" class="campo resize-y py-4 leading-normal" aria-describedby="e-mensaje"></textarea>
+      <p id="e-mensaje" class="error hidden text-[15px] text-error">Contame un poco más (mínimo 10 caracteres).</p>
+    </div>
+    <!-- Campo trampa contra spam: las personas no lo ven -->
+    <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+    <button type="submit" class="btn-primario w-full disabled:opacity-60">Enviar mensaje</button>
+    <p data-estado class="text-[15px] text-muted" role="status" aria-live="polite"></p>
+  </form>
+
+  <div data-gracias hidden tabindex="-1" class="rounded-ui border border-accent bg-bg2 p-8">
+    <p class="mb-2 font-display text-[32px] font-semibold">¡Gracias, <span data-nombre></span>!</p>
+    <p class="text-muted">Recibí tu mensaje y te respondo en menos de 24 horas.</p>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.formulario-contacto').forEach((caja) => {
+    const form = caja.querySelector('form')!;
+    const gracias = caja.querySelector<HTMLElement>('[data-gracias]')!;
+    const estado = form.querySelector<HTMLElement>('[data-estado]')!;
+    const boton = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const campos = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[required], textarea[required]')];
+
+    // Muestra u oculta el mensaje de error de un campo
+    const validar = (c: HTMLInputElement | HTMLTextAreaElement) => {
+      const ok = c.value.trim() !== '' && c.checkValidity();
+      c.setAttribute('aria-invalid', String(!ok));
+      document.getElementById(c.getAttribute('aria-describedby')!)?.classList.toggle('hidden', ok);
+      return ok;
+    };
+    campos.forEach((c) => c.addEventListener('blur', () => c.value && validar(c)));
+    campos.forEach((c) => c.addEventListener('input', () => c.getAttribute('aria-invalid') === 'true' && validar(c)));
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const invalidos = campos.filter((c) => !validar(c));
+      if (invalidos.length) {
+        invalidos[0].focus();
+        estado.textContent = 'Revisá los campos marcados.';
+        return;
+      }
+      const datos = new FormData(form);
+      const nombre = String(datos.get('nombre')).trim();
+
+      // Sin Formspree configurado: abre el correo con el mensaje armado
+      if (!form.action || !form.getAttribute('action')) {
+        const cuerpo = `Nombre: ${nombre}\nEmail: ${datos.get('email')}\nTipo de proyecto: ${datos.get('tipo')}\n\n${datos.get('mensaje')}`;
+        location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent('Proyecto: ' + datos.get('tipo'))}&body=${encodeURIComponent(cuerpo)}`;
+        return;
+      }
+
+      boton.disabled = true;
+      estado.textContent = 'Enviando…';
+      try {
+        const r = await fetch(form.action, { method: 'POST', body: datos, headers: { Accept: 'application/json' } });
+        if (!r.ok) throw new Error(String(r.status));
+        caja.querySelector('[data-nombre]')!.textContent = nombre;
+        form.hidden = true;
+        gracias.hidden = false;
+        gracias.focus();
+      } catch {
+        estado.textContent = 'No se pudo enviar. Probá de nuevo o escribime por WhatsApp o email.';
+        boton.disabled = false;
+      }
+    });
+  });
+</script>

@@ -1,0 +1,112 @@
+---
+import { claveCategoria } from '../lib/proyectos';
+
+interface Props {
+  categorias: string[];
+  /** id de la grilla que se filtra */
+  grilla: string;
+}
+const { categorias, grilla } = Astro.props;
+const opciones = [{ etiqueta: 'Todos', clave: 'todos' }, ...categorias.map((c) => ({ etiqueta: c, clave: claveCategoria(c) }))];
+---
+
+<div class="filtros mb-8" data-grilla={grilla}>
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <!-- En teléfono los botones se deslizan en horizontal -->
+    <div
+      role="group"
+      aria-label="Filtrar por categoría"
+      class="sin-scrollbar -mx-5 flex snap-x snap-proximity gap-2.5 overflow-x-auto px-5 py-0.5 md:-mx-10 md:px-10 lg:mx-0 lg:flex-wrap lg:px-0"
+    >
+      {
+        opciones.map((o, i) => (
+          <button
+            type="button"
+            data-categoria={o.clave}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            class="chip min-h-12 shrink-0 snap-start rounded-full border border-line px-[22px] font-semibold whitespace-nowrap transition-colors"
+          >
+            {o.etiqueta}
+          </button>
+        ))
+      }
+    </div>
+    <label class="flex items-center gap-3 text-[15px] font-medium text-muted">
+      Ordenar
+      <select data-orden class="campo h-12 w-auto pr-10 font-semibold">
+        <option value="desc">Más recientes primero</option>
+        <option value="asc">Más antiguos primero</option>
+      </select>
+    </label>
+  </div>
+  <p data-resumen class="sr-only" aria-live="polite"></p>
+</div>
+<p data-vacio hidden class="rounded-ui border border-line p-8 text-muted">
+  Todavía no hay trabajos en esta categoría.
+</p>
+
+<style>
+  .chip[aria-pressed='true'] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--onaccent);
+  }
+  .chip[aria-pressed='false']:hover {
+    border-color: var(--fg);
+  }
+</style>
+
+<script>
+  // Filtra y ordena las tarjetas sin recargar la página; guarda el filtro en la URL
+  document.querySelectorAll<HTMLElement>('.filtros').forEach((caja) => {
+    const grilla = document.getElementById(caja.dataset.grilla!)!;
+    const chips = [...caja.querySelectorAll<HTMLButtonElement>('[data-categoria]')];
+    const orden = caja.querySelector<HTMLSelectElement>('[data-orden]')!;
+    const resumen = caja.querySelector<HTMLElement>('[data-resumen]')!;
+    const vacio = caja.nextElementSibling as HTMLElement;
+    const tarjetas = [...grilla.querySelectorAll<HTMLElement>('.tarjeta')];
+
+    function aplicar(categoria: string, ordenar: string, actualizarUrl = true) {
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.categoria === categoria)));
+      let visibles = 0;
+      const ordenadas = [...tarjetas].sort(
+        (a, b) => (Number(b.dataset.anio) - Number(a.dataset.anio)) * (ordenar === 'asc' ? -1 : 1),
+      );
+      // Solo se mueven las tarjetas si el orden cambió
+      const cambio = ordenadas.some((t, i) => grilla.children[i] !== t);
+      ordenadas.forEach((t) => {
+        const mostrar = categoria === 'todos' || t.dataset.categorias!.split(' ').includes(categoria);
+        t.hidden = !mostrar;
+        if (mostrar) visibles++;
+        if (cambio) {
+          grilla.appendChild(t);
+          // Al mover una imagen diferida, Chrome a veces deja de cargarla: se fuerza la carga
+          t.querySelectorAll('img[loading=lazy]').forEach((img) => ((img as HTMLImageElement).loading = 'eager'));
+        }
+      });
+      vacio.hidden = visibles > 0;
+      resumen.textContent = `${visibles} ${visibles === 1 ? 'trabajo' : 'trabajos'}`;
+      if (actualizarUrl) {
+        const url = new URL(location.href);
+        categoria === 'todos' ? url.searchParams.delete('categoria') : url.searchParams.set('categoria', categoria);
+        ordenar === 'asc' ? url.searchParams.set('orden', 'asc') : url.searchParams.delete('orden');
+        history.replaceState(null, '', url);
+      }
+    }
+
+    const actual = () => chips.find((c) => c.getAttribute('aria-pressed') === 'true')?.dataset.categoria ?? 'todos';
+    chips.forEach((c) => c.addEventListener('click', () => aplicar(c.dataset.categoria!, orden.value)));
+    orden.addEventListener('change', () => aplicar(actual(), orden.value));
+
+    // Estado inicial desde la URL (?categoria=videoclips&orden=asc)
+    const params = new URLSearchParams(location.search);
+    const inicial = params.get('categoria');
+    orden.value = params.get('orden') === 'asc' ? 'asc' : 'desc';
+    aplicar(chips.some((c) => c.dataset.categoria === inicial) ? inicial! : 'todos', orden.value, false);
+    // Si el filtro elegido quedó fuera de la vista en teléfono, se desliza hasta él
+    if (inicial) {
+      const chip = chips.find((c) => c.getAttribute('aria-pressed') === 'true');
+      chip?.parentElement?.scrollTo({ left: chip.offsetLeft - 20 });
+    }
+  });
+</script>

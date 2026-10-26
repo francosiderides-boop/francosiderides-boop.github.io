@@ -1,0 +1,130 @@
+@import 'tailwindcss';
+
+/* Modo oscuro manual: se activa con data-theme="dark" en <html> */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/*
+  Colores del diseño. El acento (--accent) y el radio (--r) llegan desde
+  /config/sitio.json como estilo en línea sobre <html>.
+*/
+:root {
+  --accent: #3fd0c0;
+  --onaccent: #111111;
+  --r: 4px;
+
+  /* Tema claro */
+  --bg: #eef0f1;
+  --bg2: #dee2e4;
+  --fg: #101315;
+  --muted: #50585d;
+  --line: rgba(16, 19, 21, 0.18);
+  --glass: rgba(238, 240, 241, 0.85);
+  --ink: color-mix(in oklch, var(--accent) 50%, black);
+  --error: #b3261e;
+  --thumb-a: oklch(0.84 0.035 var(--h, 235));
+  --thumb-b: oklch(0.875 0.035 var(--h, 235));
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --bg: #0a0c0e;
+  --bg2: #13171a;
+  --fg: #eceff1;
+  --muted: #9aa3a9;
+  --line: rgba(236, 239, 241, 0.16);
+  --glass: rgba(10, 12, 14, 0.82);
+  --ink: var(--accent);
+  --error: #ff8a80;
+  --thumb-a: oklch(0.22 0.035 var(--h, 235));
+  --thumb-b: oklch(0.255 0.035 var(--h, 235));
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg2: var(--bg2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-glass: var(--glass);
+  --color-accent: var(--accent);
+  --color-onaccent: var(--onaccent);
+  --color-ink: var(--ink);
+  --color-error: var(--error);
+  --radius-ui: var(--r);
+  --font-display: var(--font-barlow), 'Arial Narrow', sans-serif;
+  --font-sans: var(--font-hanken), system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--fg);
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 96px;
+  }
+  body {
+    @apply font-sans antialiased;
+    background: var(--bg);
+    /* Evita scroll horizontal accidental en cualquier tamaño */
+    overflow-x: clip;
+    transition:
+      background-color 0.4s ease,
+      color 0.4s ease;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  img,
+  video,
+  iframe {
+    max-width: 100%;
+  }
+}
+
+@layer components {
+  /* Etiqueta pequeña en mayúsculas ("SELECCIÓN", "PORTFOLIO"...) */
+  .eyebrow {
+    @apply text-[15px] font-medium tracking-[.08em] uppercase text-ink;
+  }
+  .contenedor {
+    @apply mx-auto w-full max-w-[1360px];
+  }
+  .pad-x {
+    @apply px-5 md:px-10 lg:px-20;
+  }
+  .btn-primario,
+  .btn-borde {
+    @apply inline-flex min-h-[52px] items-center justify-center gap-2 rounded-ui px-7 text-base font-semibold transition duration-200;
+  }
+  .btn-primario {
+    @apply bg-accent text-onaccent hover:brightness-110;
+  }
+  .btn-borde {
+    @apply border border-line text-fg hover:border-fg;
+  }
+  /* Fondo rayado del diseño, usado mientras carga una imagen o si falta */
+  .rayado {
+    background: repeating-linear-gradient(135deg, var(--thumb-a) 0 14px, var(--thumb-b) 14px 28px);
+  }
+  .campo {
+    @apply w-full rounded-ui border border-line bg-bg2 px-4 text-base text-fg outline-none focus:border-accent;
+  }
+  .sin-scrollbar {
+    scrollbar-width: none;
+  }
+  .sin-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

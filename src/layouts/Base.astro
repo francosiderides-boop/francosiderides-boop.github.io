@@ -1,0 +1,85 @@
+---
+import { Font } from 'astro:assets';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import BotonWhatsApp from '../components/BotonWhatsApp.astro';
+import { sitio, colorSobreAcento } from '../lib/sitio';
+import { imagenParaCompartir } from '../lib/imagenes';
+
+interface Props {
+  titulo?: string;
+  descripcion?: string;
+  /** Ruta de la imagen para compartir (ya procesada) */
+  imagen?: string;
+  tipo?: 'website' | 'article' | 'video.other';
+  /** Ocultar de buscadores (ej. borradores o 404) */
+  noIndexar?: boolean;
+}
+
+const { titulo, descripcion = sitio.descripcion, tipo = 'website', noIndexar = false } = Astro.props;
+const tituloCompleto = titulo ? `${titulo} — ${sitio.nombre}` : `${sitio.nombre} — ${sitio.especialidad}`;
+const url = new URL(Astro.url.pathname, Astro.site);
+const imagenOg = new URL(
+  Astro.props.imagen ?? (await imagenParaCompartir(sitio.hero.imagen, '/config')) ?? '/favicon.svg',
+  Astro.site,
+);
+
+// Variables de diseño que vienen de /config/sitio.json
+const estiloRaiz = `--accent:${sitio.colorAcento};--onaccent:${colorSobreAcento()};--r:${sitio.radioBordes}px`;
+const temaInicial = sitio.temaPorDefecto === 'claro' ? 'light' : sitio.temaPorDefecto === 'sistema' ? 'system' : 'dark';
+---
+
+<!doctype html>
+<html lang={sitio.idioma} style={estiloRaiz} data-theme={temaInicial === 'light' ? 'light' : 'dark'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="canonical" href={url} />
+    {noIndexar && <meta name="robots" content="noindex" />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#0A0C0E" />
+
+    <!-- Open Graph / redes sociales -->
+    <meta property="og:type" content={tipo} />
+    <meta property="og:site_name" content={sitio.nombre} />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={url} />
+    <meta property="og:image" content={imagenOg} />
+    <meta property="og:locale" content={sitio.idioma.replace('-', '_')} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={tituloCompleto} />
+    <meta name="twitter:description" content={descripcion} />
+    <meta name="twitter:image" content={imagenOg} />
+
+    <Font cssVariable="--font-barlow" preload={[{ weight: '600' }]} />
+    <Font cssVariable="--font-hanken" preload={[{ weight: '400' }]} />
+
+    <!-- Aplica el tema guardado antes de pintar la página (evita el parpadeo) -->
+    <script is:inline define:vars={{ temaInicial }}>
+      try {
+        var guardado = localStorage.getItem('tema');
+        var tema = guardado || temaInicial;
+        if (tema === 'system') tema = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = tema;
+      } catch (e) {}
+    </script>
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a
+      href="#contenido"
+      class="sr-only z-50 rounded-ui bg-accent px-4 py-3 font-semibold text-onaccent focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+      >Saltar al contenido</a
+    >
+    <Header />
+    <main id="contenido" class="flex-1" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <BotonWhatsApp />
+  </body>
+</html>

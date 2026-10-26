@@ -1,0 +1,37 @@
+---
+import { prepararImagen } from '../lib/imagenes';
+
+interface Props {
+  src: string;
+  /** Carpeta desde la que se resuelve una ruta relativa */
+  carpeta: string;
+  alt: string;
+  /** Qué ancho ocupa la imagen en cada pantalla (atributo sizes) */
+  sizes?: string;
+  clase?: string;
+  /** true solo para la imagen principal visible al cargar (mejora el puntaje de Lighthouse) */
+  prioridad?: boolean;
+}
+
+const { src, carpeta, alt, sizes = '100vw', clase = '', prioridad = false } = Astro.props;
+const img = await prepararImagen(src, carpeta);
+---
+
+{
+  img ? (
+    <img
+      src={img.src}
+      srcset={img.srcset || undefined}
+      sizes={img.srcset ? sizes : undefined}
+      width={img.width}
+      height={img.height}
+      alt={alt}
+      loading={prioridad ? 'eager' : 'lazy'}
+      fetchpriority={prioridad ? 'high' : undefined}
+      decoding="async"
+      class={clase}
+    />
+  ) : (
+    <div class:list={['rayado', clase]} role="img" aria-label={alt} />
+  )
+}

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+# Copia local de lo que descarga el importador de Behance
+.cache-behance/
+
+# Configuración local del editor/vista previa
+.claude/

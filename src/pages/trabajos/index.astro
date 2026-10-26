@@ -1,0 +1,51 @@
+---
+import Base from '../../layouts/Base.astro';
+import GrillaProyectos from '../../components/GrillaProyectos.astro';
+import FiltrosCategorias from '../../components/FiltrosCategorias.astro';
+import { sitio } from '../../lib/sitio';
+import { obtenerProyectos } from '../../lib/proyectos';
+
+const proyectos = await obtenerProyectos();
+const behance = sitio.redes.find((r) => r.nombre === 'Behance');
+
+// Muestra las categorías de sitio.json que tienen al menos un trabajo, en ese orden
+const usadas = new Set(proyectos.flatMap((p) => p.data.categorias));
+const categorias = sitio.categorias.filter((c) => usadas.has(c));
+// Categorías escritas en los proyectos que no están en sitio.json (también se muestran)
+const extra = [...usadas].filter((c) => !sitio.categorias.includes(c));
+if (proyectos.some((p) => p.data.categorias.length === 0)) extra.push('Sin categoría');
+---
+
+<Base
+  titulo="Trabajos"
+  descripcion={`Portfolio de ${sitio.nombre}: ${sitio.categorias.join(', ').toLowerCase()}.`}
+>
+  <div class="pad-x pt-8 pb-[72px] md:pt-14 md:pb-24 lg:pt-[72px] lg:pb-[140px]">
+    <div class="contenedor">
+      <p class="eyebrow mb-3">Portfolio</p>
+      <h1 class="mb-7 font-display text-5xl leading-[.98] font-semibold md:text-[72px] lg:text-[104px]">Trabajos</h1>
+      {
+        proyectos.length > 0 ? (
+          <>
+            <FiltrosCategorias categorias={[...categorias, ...extra]} grilla="grilla-trabajos" />
+            <GrillaProyectos proyectos={proyectos} nivel="h2" id="grilla-trabajos" />
+          </>
+        ) : (
+          <div class="flex flex-col items-start gap-6 rounded-ui bg-bg2 p-7 md:p-12">
+            <p class="max-w-[560px] text-lg leading-normal text-muted">
+              Estoy cargando mis trabajos en este sitio. Mientras tanto, podés ver mi portfolio completo en Behance.
+            </p>
+            <div class="flex flex-wrap gap-3">
+              {behance && (
+                <a href={behance.url} target="_blank" rel="noopener" class="btn-primario">
+                  Ver mi Behance
+                </a>
+              )}
+              <a href="/contacto/" class="btn-borde">Contactame</a>
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</Base>

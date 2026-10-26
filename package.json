@@ -1,0 +1,27 @@
+{
+  "name": "franco-gonzalez-portfolio",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "importar:behance": "node scripts/importar-behance.mjs",
+    "publicar": "node scripts/publicar.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.4.2",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "cheerio": "^1.2.0",
+    "yaml": "^2.9.1"
+  },
+  "engines": {
+    "node": ">=22.23.4"
+  }
+}

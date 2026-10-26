@@ -1,0 +1,48 @@
+---
+import { sitio, navegacion } from '../lib/sitio';
+import ToggleTema from './ToggleTema.astro';
+import MenuMovil from './MenuMovil.astro';
+
+// Marca el enlace de la sección actual (Trabajos también queda activo dentro de un proyecto)
+const ruta = Astro.url.pathname;
+const activo = (href: string) => (href === '/' ? ruta === '/' : ruta.startsWith(href));
+---
+
+<header
+  class="pad-x sticky top-0 z-30 flex h-16 items-center justify-between border-b border-line bg-glass backdrop-blur-md md:h-[72px] lg:h-20"
+>
+  <a
+    href="/"
+    class="flex min-h-12 items-center font-display text-[26px] font-semibold tracking-[.01em] whitespace-nowrap uppercase lg:text-[30px]"
+  >
+    {sitio.nombre}
+  </a>
+
+  <!-- Menú horizontal: tablet y computadora -->
+  <nav aria-label="Principal" class="hidden items-center gap-4 md:flex lg:gap-9">
+    <ul class="flex items-center gap-5 lg:gap-9">
+      {
+        navegacion.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={activo(item.href) ? 'page' : undefined}
+              class:list={[
+                '-mb-0.5 flex min-h-12 items-center border-b-2 px-1 font-semibold transition-colors',
+                activo(item.href) ? 'border-accent text-fg' : 'border-transparent text-muted hover:text-fg',
+              ]}
+            >
+              {item.etiqueta}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <ToggleTema clase="min-h-12 min-w-12 px-3 text-[15px] lg:px-4" claseTexto="sr-only lg:not-sr-only" />
+    <!-- Botón de contacto fijo en computadora -->
+    <a href="/contacto/" class="btn-primario hidden min-h-12 px-6 lg:inline-flex">Contactame</a>
+  </nav>
+
+  <!-- Menú hamburguesa: teléfono -->
+  <MenuMovil activo={navegacion.map((n) => activo(n.href))} />
+</header>

@@ -1,0 +1,6 @@
+# Enlaces de proyectos de Behance para importar (uno por línea).
+# Usalo si el feed no trae todos tus proyectos: copiá la dirección de cada
+# proyecto desde el navegador y pegala debajo. Las líneas con # se ignoran.
+#
+# Ejemplo:
+# https://www.behance.net/gallery/255877249/HIJOS-DE-LA-DESDICHA

@@ -1,0 +1,33 @@
+---
+import type { Proyecto } from '../lib/proyectos';
+
+interface Props {
+  proyecto: Proyecto;
+}
+const { data } = Astro.props.proyecto;
+
+// Solo se muestran los datos que tienen contenido
+const filas = [
+  ['Rol', data.rol],
+  ['Cliente', data.cliente],
+  ['Año', String(data.anio)],
+  ['Duración', data.duracion],
+  ['Equipo', data.ficha.equipo],
+  ['Cámara', data.ficha.camara],
+  ...data.fichaExtra.map((f) => [f.dato, f.valor]),
+].filter(([, valor]) => valor && valor.trim());
+---
+
+<section aria-labelledby="titulo-ficha" class="border-t border-line">
+  <h2 id="titulo-ficha" class="eyebrow mt-5 mb-1">Ficha técnica</h2>
+  <dl>
+    {
+      filas.map(([dato, valor]) => (
+        <div class="grid grid-cols-[110px_1fr] gap-4 border-b border-line py-3.5 md:grid-cols-[140px_1fr]">
+          <dt class="text-[15px] font-medium tracking-[.06em] text-muted uppercase">{dato}</dt>
+          <dd class="leading-snug font-medium md:text-[17px] lg:text-lg">{valor}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</section>

@@ -1,0 +1,129 @@
+---
+import Base from '../layouts/Base.astro';
+import Imagen from '../components/Imagen.astro';
+import GrillaProyectos from '../components/GrillaProyectos.astro';
+import { sitio } from '../lib/sitio';
+import { obtenerDestacados } from '../lib/proyectos';
+
+const destacados = await obtenerDestacados(3);
+const { hero, inicio } = sitio;
+---
+
+<Base>
+  <!-- HERO: imagen (o video en loop si se configura) a pantalla completa -->
+  <section
+    aria-labelledby="titulo-hero"
+    class="relative flex min-h-[max(520px,calc(100svh-64px))] items-end overflow-hidden bg-[#0d1418] md:min-h-[max(520px,calc(100svh-72px))] lg:min-h-[max(520px,calc(100svh-80px))]"
+  >
+    <Imagen
+      src={hero.imagen}
+      carpeta="/config"
+      alt=""
+      sizes="100vw"
+      clase="absolute inset-0 size-full object-cover"
+      prioridad
+    />
+    {
+      hero.video && (
+        <video
+          class="hero-video absolute inset-0 size-full object-cover"
+          src={hero.video}
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="none"
+          aria-hidden="true"
+        />
+      )
+    }
+    <div
+      class="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,8,9,.35)_0%,rgba(8,8,9,.05)_35%,rgba(8,8,9,.88)_100%)]"
+    >
+    </div>
+    {
+      hero.etiquetaReel && (
+        <p
+          aria-hidden="true"
+          class="pad-x absolute top-6 right-0 left-0 hidden justify-between text-[15px] font-medium tracking-[.08em] text-[#C3CBD0] uppercase md:flex"
+        >
+          <span>● {hero.etiquetaReel}</span>
+        </p>
+      )
+    }
+    <div class="pad-x relative w-full pb-24 text-[#ECEFF1] md:pb-24 lg:pb-[88px]">
+    <div class="contenedor">
+      <p
+        class="mb-5 inline-flex items-center gap-2.5 text-[15px] font-medium tracking-[.08em] text-accent uppercase"
+      >
+        <span class="size-2 rounded-full bg-accent"></span>{hero.disponibilidad}
+      </p>
+      <h1
+        id="titulo-hero"
+        class="mb-4 font-display text-[56px] leading-[.95] font-semibold tracking-[-.01em] md:text-[96px] lg:text-[148px]"
+      >
+        {sitio.nombre}
+      </h1>
+      <p class="mb-2 text-lg leading-snug font-semibold tracking-[.02em] md:text-xl lg:text-[22px]">
+        {sitio.especialidad}
+      </p>
+      <p class="mb-8 max-w-[520px] leading-normal text-[#C3CBD0] md:text-[17px] lg:text-lg">{hero.frase}</p>
+      <div class="flex flex-wrap gap-3">
+        <a href="/trabajos/" class="btn-primario">Ver trabajos</a>
+        <a href="/contacto/" class="btn-borde border-[#ECEFF1]/50 text-[#ECEFF1] hover:border-[#ECEFF1]">Contactame</a>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- DESTACADOS (se oculta mientras no haya proyectos publicados) -->
+  {destacados.length > 0 && (
+  <section aria-labelledby="titulo-destacados" class="pad-x pt-[72px] md:pt-24 lg:pt-[140px]">
+    <div class="contenedor">
+      <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="eyebrow mb-3">Selección</p>
+          <h2 id="titulo-destacados" class="font-display text-4xl leading-none font-semibold md:text-[46px] lg:text-[64px]">
+            {inicio.tituloDestacados}
+          </h2>
+        </div>
+        <a href="/trabajos/" class="flex min-h-12 items-center border-b border-accent font-semibold">Ver todos →</a>
+      </div>
+      <GrillaProyectos proyectos={destacados} />
+    </div>
+  </section>
+  )}
+
+  <!-- SERVICIOS -->
+  <section aria-label="Servicios" class="pad-x pt-[72px] md:pt-24 lg:pt-[140px]">
+    <ul class="contenedor grid grid-cols-1 gap-6 border-t border-line pt-8 md:grid-cols-3">
+      {
+        sitio.servicios.map((s) => (
+          <li>
+            <h3 class="mb-2 font-display text-[28px] font-semibold">{s.titulo}</h3>
+            <p class="leading-normal text-muted md:text-[17px] lg:text-lg">{s.descripcion}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- LLAMADO A LA ACCIÓN -->
+  <section class="pad-x py-[72px] md:py-24 lg:py-[140px]">
+    <div class="contenedor flex flex-col items-start gap-6 rounded-ui bg-bg2 p-7 md:p-12 lg:p-[72px]">
+      <h2 class="max-w-[760px] font-display text-4xl leading-[1.02] font-semibold md:text-[46px] lg:text-[64px]">
+        {inicio.ctaTitulo}
+      </h2>
+      <p class="max-w-[520px] leading-normal text-muted md:text-[17px] lg:text-lg">{inicio.ctaTexto}</p>
+      <a href="/contacto/" class="btn-primario">Contactame</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  @media (prefers-reduced-motion: reduce) {
+    .hero-video {
+      display: none;
+    }
+  }
+</style>

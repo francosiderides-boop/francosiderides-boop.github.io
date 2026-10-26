@@ -1,0 +1,66 @@
+---
+import Imagen from './Imagen.astro';
+import { urlEmbebida } from '../lib/video';
+
+interface Props {
+  url: string;
+  titulo: string;
+  poster: string;
+  carpeta: string;
+  duracion?: string;
+}
+const { url, titulo, poster, carpeta, duracion } = Astro.props;
+const embed = urlEmbebida(url);
+---
+
+<!--
+  Proporción 16:9 fluida. El reproductor de Vimeo/YouTube recién se carga
+  al tocar o hacer clic: hasta entonces solo se descarga la miniatura.
+-->
+<div class="video relative aspect-video overflow-hidden rounded-ui bg-bg2" data-src={embed?.src} data-titulo={titulo}>
+  <Imagen
+    src={poster}
+    carpeta={carpeta}
+    alt=""
+    sizes="(min-width: 1440px) 1360px, 100vw"
+    clase="absolute inset-0 size-full object-cover"
+    prioridad
+  />
+  {
+    embed ? (
+      <button
+        type="button"
+        class="group absolute inset-0 flex items-center justify-center bg-black/25 transition-colors hover:bg-black/10"
+        aria-label={`Reproducir video: ${titulo} (${embed.plataforma})`}
+      >
+        <span
+          aria-hidden="true"
+          class="flex size-[76px] items-center justify-center rounded-full bg-accent pl-1.5 text-[26px] text-onaccent transition-transform group-hover:scale-105 md:size-24"
+        >
+          ▶
+        </span>
+        <span class="absolute right-4 bottom-3.5 left-4 flex justify-between text-sm font-medium text-[#C3CBD0]">
+          <span>{embed.plataforma}</span>
+          {duracion && <span>{duracion}</span>}
+        </span>
+      </button>
+    ) : (
+      url && <p class="absolute inset-x-4 bottom-4 text-sm text-[#C3CBD0]">El enlace de video no es de Vimeo ni de YouTube.</p>
+    )
+  }
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.video[data-src]').forEach((caja) => {
+    caja.querySelector('button')?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = caja.dataset.src!;
+      iframe.title = `Video: ${caja.dataset.titulo}`;
+      iframe.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
+      iframe.allowFullscreen = true;
+      iframe.className = 'absolute inset-0 size-full border-0';
+      caja.replaceChildren(iframe);
+      iframe.focus();
+    });
+  });
+</script>

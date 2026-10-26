@@ -1,0 +1,95 @@
+---
+import { sitio, navegacion } from '../lib/sitio';
+import ToggleTema from './ToggleTema.astro';
+
+interface Props {
+  activo: boolean[];
+}
+const { activo } = Astro.props;
+---
+
+<button
+  type="button"
+  data-abrir-menu
+  aria-haspopup="dialog"
+  aria-expanded="false"
+  aria-controls="menu-movil"
+  class="flex min-h-12 items-center gap-2.5 rounded-ui border border-line px-[18px] font-semibold md:hidden"
+>
+  <span aria-hidden="true" class="flex flex-col gap-[5px]">
+    <span class="h-0.5 w-5 bg-fg"></span><span class="h-0.5 w-3.5 bg-fg"></span>
+  </span>
+  Menú
+</button>
+
+<!--
+  Se usa <dialog>: el navegador ya resuelve el foco atrapado dentro del menú
+  y el cierre con la tecla Esc.
+-->
+<dialog
+  id="menu-movil"
+  aria-label="Menú"
+  class="menu-movil pad-x m-0 h-dvh max-h-none w-full max-w-none flex-col bg-bg pb-7 text-fg md:hidden"
+>
+  <div class="flex h-16 shrink-0 items-center justify-between">
+    <span class="font-display text-[26px] font-semibold tracking-[.01em] uppercase">{sitio.nombre}</span>
+    <button
+      type="button"
+      data-cerrar-menu
+      class="flex min-h-12 items-center rounded-ui border border-line px-[18px] font-semibold"
+    >
+      Cerrar <span aria-hidden="true" class="ml-2">✕</span>
+    </button>
+  </div>
+  <nav aria-label="Principal (móvil)" class="mt-6 flex-1">
+    <ul>
+      {
+        navegacion.map((item, i) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={activo[i] ? 'page' : undefined}
+              class:list={[
+                'block border-b border-line py-[18px] font-display text-5xl leading-none font-semibold',
+                activo[i] ? 'text-accent' : 'text-fg',
+              ]}
+            >
+              {item.etiqueta}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+  <div class="mt-8 flex flex-col gap-3">
+    <a href="/contacto/" class="btn-primario">Contactame</a>
+    <ToggleTema clase="min-h-[52px] text-base font-semibold text-fg" />
+  </div>
+</dialog>
+
+<style>
+  .menu-movil[open] {
+    display: flex;
+  }
+  .menu-movil::backdrop {
+    background: transparent;
+  }
+</style>
+
+<script>
+  const menu = document.getElementById('menu-movil') as HTMLDialogElement | null;
+  const abrir = document.querySelector<HTMLButtonElement>('[data-abrir-menu]');
+  if (menu && abrir) {
+    abrir.addEventListener('click', () => {
+      menu.showModal();
+      abrir.setAttribute('aria-expanded', 'true');
+    });
+    menu.querySelector('[data-cerrar-menu]')?.addEventListener('click', () => menu.close());
+    menu.addEventListener('close', () => {
+      abrir.setAttribute('aria-expanded', 'false');
+      abrir.focus();
+    });
+    // Si se agranda la ventana a tamaño tablet, el menú se cierra solo
+    matchMedia('(min-width: 768px)').addEventListener('change', (e) => e.matches && menu.open && menu.close());
+  }
+</script>

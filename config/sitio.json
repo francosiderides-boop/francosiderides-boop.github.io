@@ -1,0 +1,131 @@
+{
+  "url": "https://francosiderides-boop.github.io",
+  "idioma": "es-AR",
+  "nombre": "Franco Gonzalez",
+  "especialidad": "Director / Filmmaker / Editor de video",
+  "ciudad": "Córdoba",
+  "descripcion": "Franco Gonzalez, director, filmmaker y editor de video en Córdoba. Videoclips, publicidad, documental y ficción con mirada de cine.",
+  "colorAcento": "#3FD0C0",
+  "radioBordes": 4,
+  "temaPorDefecto": "oscuro",
+  "hero": {
+    "disponibilidad": "Disponible para proyectos 2026",
+    "frase": "Videoclips, publicidad y documental con mirada de cine. Desde Córdoba.",
+    "etiquetaReel": "",
+    "imagen": "imagenes/hero.jpg",
+    "video": ""
+  },
+  "inicio": {
+    "tituloDestacados": "Trabajos destacados",
+    "ctaTitulo": "¿Tenés un proyecto en mente? Hablemos.",
+    "ctaTexto": "Contame la idea, el plazo y el presupuesto aproximado. Respondo en menos de 24 horas."
+  },
+  "servicios": [
+    {
+      "titulo": "Dirección",
+      "descripcion": "Del guion al corte final: videoclips, ficción y publicidad."
+    },
+    {
+      "titulo": "Fotografía",
+      "descripcion": "Dirección de fotografía con cámara de cine y luz cuidada."
+    },
+    {
+      "titulo": "Edición y color",
+      "descripcion": "Montaje, color y mezcla para entregar listo para emitir."
+    }
+  ],
+  "categorias": [
+    "Videoclips",
+    "Comerciales",
+    "Documental",
+    "Ficción",
+    "Eventos",
+    "Institucional"
+  ],
+  "contacto": {
+    "email": "francosiderides@gmail.com",
+    "whatsapp": "5493512651453",
+    "whatsappVisible": "+54 9 351 265-1453",
+    "mensajeWhatsapp": "¡Hola Franco! Vi tu portfolio y quiero contarte sobre un proyecto.",
+    "formspreeId": "",
+    "titulo": "Contame tu proyecto.",
+    "texto": "Respondo en menos de 24 horas. Si es urgente, escribime por WhatsApp.",
+    "tiposDeProyecto": [
+      "Videoclip",
+      "Comercial",
+      "Documental",
+      "Ficción",
+      "Evento",
+      "Otro"
+    ]
+  },
+  "redes": [
+    {
+      "nombre": "Instagram",
+      "usuario": "@gonzalezfrann",
+      "url": "https://www.instagram.com/gonzalezfrann"
+    },
+    {
+      "nombre": "Behance",
+      "usuario": "behance.net/francosiderides",
+      "url": "https://www.behance.net/francosiderides"
+    }
+  ],
+  "sobreMi": {
+    "titulo": "Cuento historias en movimiento.",
+    "foto": "imagenes/retrato.jpg",
+    "altFoto": "Retrato de Franco Gonzalez, director y filmmaker",
+    "parrafos": [
+      "Soy Franco, director y filmmaker, apasionado por el cine y las historias, radicado en Córdoba.",
+      "Soy Técnico productor en medios audiovisuales, especialista en contenido para E-Commerce y medios digitales.",
+      "Me considero creativo, lógico, resolutivo y riguroso. Busco conectar con el lado más humano y genuino a través de los contenidos.",
+      "Me gusta participar en proyectos grupales y colaborativos."
+    ],
+    "boton": "Trabajemos juntos",
+    "columnas": [
+      {
+        "titulo": "Servicios",
+        "items": [
+          "Dirección de videoclips",
+          "Publicidad y contenido de marca",
+          "Documental y ficción",
+          "Dirección de fotografía",
+          "Edición, color y entrega"
+        ]
+      }
+    ]
+  },
+  "behance": {
+    "usuario": "francosiderides",
+    "pausaEntrePedidosSegundos": 2,
+    "tamanosImagen": [
+      480,
+      960,
+      1600
+    ],
+    "mapeoEtiquetas": {
+      "music video": "Videoclips",
+      "videoclip": "Videoclips",
+      "video clip": "Videoclips",
+      "commercial": "Comerciales",
+      "comercial": "Comerciales",
+      "advertising": "Comerciales",
+      "publicidad": "Comerciales",
+      "spot": "Comerciales",
+      "documentary": "Documental",
+      "documental": "Documental",
+      "short film": "Ficción",
+      "cortometraje": "Ficción",
+      "fiction": "Ficción",
+      "ficción": "Ficción",
+      "event": "Eventos",
+      "evento": "Eventos",
+      "aftermovie": "Eventos",
+      "festival": "Eventos",
+      "institutional": "Institucional",
+      "institucional": "Institucional",
+      "corporate": "Institucional",
+      "branding": "Institucional"
+    }
+  }
+}

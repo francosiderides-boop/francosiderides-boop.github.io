@@ -1,0 +1,121 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import VideoEmbebido from '../../components/VideoEmbebido.astro';
+import Imagen from '../../components/Imagen.astro';
+import Galeria from '../../components/Galeria.astro';
+import FichaTecnica from '../../components/FichaTecnica.astro';
+import { obtenerProyectos, textoCategorias, type Proyecto } from '../../lib/proyectos';
+import { carpetaDe, datosImagen, imagenParaCompartir } from '../../lib/imagenes';
+
+// Genera una página por cada archivo de /content/proyectos
+export async function getStaticPaths() {
+  const proyectos = await obtenerProyectos();
+  return proyectos.map((proyecto, i) => ({
+    params: { slug: proyecto.id },
+    props: {
+      proyecto,
+      // El orden es el de la página Trabajos (más nuevo primero) y da la vuelta al llegar al final
+      anterior: proyectos[(i - 1 + proyectos.length) % proyectos.length],
+      siguiente: proyectos[(i + 1) % proyectos.length],
+    },
+  }));
+}
+
+interface Props {
+  proyecto: Proyecto;
+  anterior: Proyecto;
+  siguiente: Proyecto;
+}
+
+const { proyecto, anterior, siguiente } = Astro.props;
+const { data } = proyecto;
+const { Content } = await render(proyecto);
+const carpeta = carpetaDe(proyecto.filePath);
+const miniatura = datosImagen(data.miniatura).src;
+const hayOtros = anterior.id !== proyecto.id;
+const descripcion = data.sinopsis || `${data.titulo} (${data.anio}) — ${textoCategorias(proyecto)}.`;
+---
+
+<Base
+  titulo={data.titulo}
+  descripcion={descripcion}
+  imagen={await imagenParaCompartir(miniatura, carpeta)}
+  tipo="video.other"
+  noIndexar={!data.publicado}
+>
+  <article class="pad-x pt-8 pb-[72px] md:pt-14 md:pb-24 lg:pt-[72px] lg:pb-[140px]">
+    <div class="contenedor">
+      <a href="/trabajos/" class="inline-flex min-h-12 items-center font-semibold text-muted hover:text-fg">← Trabajos</a>
+      {
+        !data.publicado && (
+          <p class="my-3 rounded-ui border border-[#c23] p-4 text-[15px]">
+            <strong>Borrador:</strong> esta página solo se ve en tu computadora. Para publicarla, cambiá
+            <code>publicado: false</code> por <code>publicado: true</code> en su archivo.
+          </p>
+        )
+      }
+      <p class="eyebrow my-3">{textoCategorias(proyecto)} · {data.anio}</p>
+      <h1 class="mb-7 font-display text-5xl leading-[.98] font-semibold md:text-[72px] lg:text-[104px]">{data.titulo}</h1>
+
+      {
+        data.video ? (
+          <VideoEmbebido url={data.video} titulo={data.titulo} poster={miniatura} carpeta={carpeta} duracion={data.duracion} />
+        ) : (
+          <Imagen
+            src={miniatura}
+            carpeta={carpeta}
+            alt={datosImagen(data.miniatura).alt || data.titulo}
+            sizes="(min-width: 1440px) 1360px, 100vw"
+            clase="aspect-video w-full rounded-ui object-cover"
+            prioridad
+          />
+        )
+      }
+
+      <div class="mt-12 grid grid-cols-1 gap-12 md:mt-14 lg:mt-20 lg:grid-cols-2 lg:gap-20">
+        <section aria-labelledby="titulo-sinopsis">
+          <h2 id="titulo-sinopsis" class="mb-4 font-display text-[32px] font-semibold">Sinopsis</h2>
+          {data.sinopsis && <p class="max-w-[560px] leading-relaxed text-muted md:text-[17px] lg:text-lg">{data.sinopsis}</p>}
+          <div class="texto-largo mt-4 max-w-[560px] leading-relaxed text-muted md:text-[17px] lg:text-lg">
+            <Content />
+          </div>
+        </section>
+        <FichaTecnica proyecto={proyecto} />
+      </div>
+
+      <Galeria stills={data.stills} carpeta={carpeta} titulo={data.titulo} />
+
+      {
+        hayOtros && (
+          <nav aria-label="Otros proyectos" class="mt-12 grid grid-cols-1 gap-8 border-t border-line pt-7 md:mt-14 lg:mt-20 lg:grid-cols-[1fr_2fr]">
+            <a href={`/trabajos/${anterior.id}/`} rel="prev" class="group order-2 block lg:order-1">
+              <span class="mb-3 block text-[15px] font-medium tracking-[.08em] text-muted uppercase">← Anterior</span>
+              <span class="font-display text-[32px] leading-none font-semibold group-hover:text-accent">{anterior.data.titulo}</span>
+            </a>
+            <a href={`/trabajos/${siguiente.id}/`} rel="next" class="group order-1 block lg:order-2">
+              <span class="mb-3 block text-[15px] font-medium tracking-[.08em] text-muted uppercase lg:text-right">Siguiente proyecto</span>
+              <span class="flex items-center justify-between gap-4 lg:justify-end lg:gap-6">
+                <span class="font-display text-4xl leading-none font-semibold group-hover:text-accent md:text-[46px] lg:text-[64px]">
+                  {siguiente.data.titulo}
+                </span>
+                <span aria-hidden="true" class="flex size-14 shrink-0 items-center justify-center rounded-full bg-accent text-2xl text-onaccent">→</span>
+              </span>
+            </a>
+          </nav>
+        )
+      }
+    </div>
+  </article>
+</Base>
+
+<style>
+  .texto-largo :global(p + p) {
+    margin-top: 1em;
+  }
+  .texto-largo :global(a) {
+    color: var(--fg);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

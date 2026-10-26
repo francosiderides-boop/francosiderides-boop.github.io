@@ -1,0 +1,72 @@
+---
+import Imagen from './Imagen.astro';
+import { type Proyecto, textoCategorias, claveCategoria } from '../lib/proyectos';
+import { carpetaDe, datosImagen } from '../lib/imagenes';
+
+interface Props {
+  proyecto: Proyecto;
+  prioridad?: boolean;
+  /** Nivel del título (h2 en Trabajos, h3 en la portada) */
+  nivel?: 'h2' | 'h3';
+}
+
+const { proyecto, prioridad = false, nivel = 'h3' } = Astro.props;
+const { data } = proyecto;
+const miniatura = datosImagen(data.miniatura);
+const Titulo = nivel;
+---
+
+<article
+  class="tarjeta group relative"
+  data-categorias={data.categorias.map(claveCategoria).join(' ') || 'sin-categoria'}
+  data-anio={data.anio}
+>
+  <div class="relative aspect-video overflow-hidden rounded-ui bg-bg2">
+    <Imagen
+      src={miniatura.src}
+      carpeta={carpetaDe(proyecto.filePath)}
+      alt=""
+      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+      clase="size-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+      prioridad={prioridad}
+    />
+    {
+      !data.publicado && (
+        <span class="absolute top-3 left-3 rounded-ui bg-[#c23] px-2.5 py-1 text-sm font-bold text-white">BORRADOR</span>
+      )
+    }
+    <!-- Vista previa animada: solo en computadora con mouse; es un extra, no oculta información -->
+    <div
+      aria-hidden="true"
+      class="vista-previa absolute inset-0 hidden flex-col justify-between bg-[rgba(8,8,9,.55)] p-3.5 text-[#ECEFF1] opacity-0 transition-opacity duration-300"
+    >
+      <span class="text-sm font-medium tracking-[.08em]">▶ VER PROYECTO</span>
+      <div class="h-[3px] bg-white/20"><div class="barra h-[3px] w-0 bg-accent"></div></div>
+    </div>
+  </div>
+  <div class="mt-3.5 flex items-baseline justify-between gap-3">
+    <Titulo class="font-display text-[26px] leading-[1.1] font-semibold">
+      <!-- El enlace cubre toda la tarjeta (zona táctil grande) -->
+      <a href={`/trabajos/${proyecto.id}/`} class="after:absolute after:inset-0 after:rounded-ui">{data.titulo}</a>
+    </Titulo>
+    <span class="shrink-0 text-[15px] font-medium text-muted">{data.anio}</span>
+  </div>
+  <p class="mt-1.5 text-[15px] font-medium tracking-[.06em] text-ink uppercase">{textoCategorias(proyecto)}</p>
+  {data.rol && <p class="mt-1 text-[15px] text-muted">{data.rol}</p>}
+</article>
+
+<style>
+  @media (hover: hover) and (min-width: 1024px) {
+    .vista-previa {
+      display: flex;
+    }
+    .tarjeta:hover .vista-previa,
+    .tarjeta:focus-within .vista-previa {
+      opacity: 1;
+    }
+    .tarjeta:hover .barra {
+      width: 100%;
+      transition: width 6s linear;
+    }
+  }
+</style>
