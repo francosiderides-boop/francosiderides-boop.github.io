@@ -208,16 +208,23 @@ Podés correrlo las veces que quieras:
 
 Todas estas opciones son **gratis**. Este sitio ya está preparado para **GitHub Pages** (recomendado): se publica solo cada vez que subís cambios y no necesita otra cuenta además de GitHub.
 
-### Opción recomendada: GitHub Pages (gratis, se actualiza solo)
+### Opción recomendada: GitHub Pages (gratis) — ya está funcionando
 
-El sitio se publica en **https://francosiderides-boop.github.io**. Ya está configurado: el archivo `.github/workflows/publicar.yml` arma y publica el sitio automáticamente.
+El sitio está publicado en **https://francosiderides-boop.github.io**.
 
-**Para subir cambios** (después de editar un proyecto, los textos o importar de Behance):
+**Para actualizarlo** (después de editar un proyecto, los textos o importar de Behance), abrí la terminal en la carpeta del sitio y escribí:
+
+```bash
+npm run publicar
+```
+
+Ese comando arma el sitio y lo sube a GitHub. En 1 o 2 minutos los cambios están online.
+
+**Para guardar una copia del código en GitHub** (recomendado, así no perdés nada si se rompe la computadora):
 
 1. Instalá [GitHub Desktop](https://desktop.github.com) (gratis) e iniciá sesión con tu cuenta de GitHub.
 2. **File → Add local repository** y elegí la carpeta del sitio (solo la primera vez).
-3. Vas a ver la lista de archivos que cambiaste. Abajo a la izquierda escribí un resumen (ej. "Agrego videoclip nuevo") y tocá **Commit to main**.
-4. Tocá **Push origin**. En 1 o 2 minutos el sitio está actualizado. Podés ver el avance en GitHub → tu repositorio → pestaña **Actions**.
+3. Escribí un resumen del cambio abajo a la izquierda, tocá **Commit to main** y después **Push origin**.
 
 > GitHub Pages gratis exige que el repositorio sea **público**: cualquiera puede ver el código del sitio. Es normal y no expone nada privado (no hay contraseñas en estos archivos).
 
@@ -272,5 +279,5 @@ Para Netlify o Vercel: primero comprá el dominio (por ejemplo en [nic.ar](https
 - Esquema de proyectos: `src/content.config.ts`. Componentes: `src/components/`. Páginas: `src/pages/`.
 - Imágenes de `/content` y `/config/imagenes`: las optimiza `astro:assets` (WebP 480/960/1600). Imágenes de `/public/proyectos` (importadas): ya vienen optimizadas por el importador; `src/lib/imagenes.ts` arma el `srcset` con sus variantes.
 - Importador: `scripts/importar-behance.mjs` y `scripts/behance/`. Respeta `robots.txt`, se identifica como `PortfolioImporter/1.0` y se detiene ante 401/403/429 o captcha. El estado de cada proyecto importado se guarda en `.importado-behance.json`, dentro de su carpeta, para comparar en tres vías y no pisar lo editado a mano.
-- Publicación: GitHub Actions + GitHub Pages (`.github/workflows/publicar.yml`); alternativa en `netlify.toml`.
+- Publicación: `npm run publicar` (`scripts/publicar.mjs`) arma el sitio y lo sube con push forzado a la rama `gh-pages`, que GitHub Pages sirve tal cual (con `.nojekyll`). Alternativa: `netlify.toml`.
 - Comprobado con Lighthouse en modo móvil: 99 de rendimiento y 100 en accesibilidad, buenas prácticas y SEO.
