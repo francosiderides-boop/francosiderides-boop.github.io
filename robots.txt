@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://francosiderides-boop.github.io/sitemap-index.xml
