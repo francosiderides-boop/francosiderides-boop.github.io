@@ -42,6 +42,7 @@ function separar(texto) {
 }
 
 const igual = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+const vacio = (v) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0);
 
 /**
  * Escribe el proyecto. Devuelve { accion: 'creado' | 'actualizado' | 'sin cambios', conflictos: [campo] }.
@@ -69,11 +70,12 @@ export function escribirProyecto({ carpetaProyecto, slug, nuevo, behance, fecha 
   const guardado = { ...anterior };
 
   for (const campo of CAMPOS_IMPORTADOS) {
+    if (!(campo in nuevo)) continue; // importación parcial (ej. solo feed): este dato no se conoce
     const actual = campo === 'cuerpo' ? cuerpo.trim() : doc.toJS()?.[campo];
     const valorNuevo = nuevo[campo];
     if (igual(valorNuevo, anterior[campo])) continue; // Behance no cambió este dato
 
-    const sinTocar = !(campo in anterior) ? actual === undefined || actual === '' : igual(actual, anterior[campo]);
+    const sinTocar = !(campo in anterior) ? vacio(actual) : igual(actual, anterior[campo]);
     if (!sinTocar) {
       // Lo editaste a mano: se mantiene tu versión
       conflictos.push(campo);
@@ -100,7 +102,8 @@ export function escribirProyecto({ carpetaProyecto, slug, nuevo, behance, fecha 
 
 const y = (v) => JSON.stringify(v ?? ''); // texto entre comillas, válido en YAML
 
-function plantillaNueva({ slug, nuevo, behance, fecha }) {
+function plantillaNueva({ slug, nuevo: parcial, behance, fecha }) {
+  const nuevo = { categorias: [], sinopsis: '', video: '', miniatura: '', stills: [], cuerpo: '', ...parcial };
   const stills = nuevo.stills.length
     ? nuevo.stills.map((s) => `  - src: ${y(s.src)}\n    alt: ""             # COMPLETAR: describí la imagen`).join('\n')
     : '  []';

@@ -129,12 +129,27 @@ const { porId, slugs } = proyectosExistentes(rutas.proyectos);
 console.log(`\nProcesando ${lista.size} proyectos…\n`);
 
 for (const item of lista.values()) {
-  // Si Behance bloqueó la lectura, solo se siguen procesando las páginas guardadas a mano
-  if (cliente.bloqueado('www.behance.net') && !item.html) continue;
   const nombre = item.titulo || item.url;
   try {
-    const html = item.html ?? (await cliente.leerPagina(item.url));
-    const datos = leerProyecto(html, { url: item.url, id: item.id });
+    // Si Behance no deja leer la página del proyecto, se usa solo lo que trae el feed
+    let datos;
+    let soloFeed = false;
+    if (item.html) {
+      datos = leerProyecto(item.html, { url: item.url, id: item.id });
+    } else if (cliente.bloqueado(new URL(item.url).host)) {
+      if (!item.titulo) throw new Error('Behance bloqueó la página y este enlace no está en el feed');
+      datos = datosDelFeed(item);
+      soloFeed = true;
+    } else {
+      try {
+        datos = leerProyecto(await cliente.leerPagina(item.url), { url: item.url, id: item.id });
+      } catch (e) {
+        if (!(e instanceof BloqueoError) || !item.titulo) throw e;
+        registrarError(nombre, e);
+        datos = datosDelFeed(item);
+        soloFeed = true;
+      }
+    }
     const titulo = datos.titulo || item.titulo || `Proyecto ${item.id}`;
 
     // Mismo proyecto ya importado → misma carpeta (aunque le hayas cambiado el slug)
@@ -147,11 +162,16 @@ for (const item of lista.values()) {
     const urlPortada = datos.portada ?? item.portada ?? datos.imagenes[0];
     const faltantes = [];
     let miniatura = '';
-    if (urlPortada) {
-      miniatura = await bajar(urlPortada, slug, 'portada', tamanos, faltantes);
+    // Para la portada se prueba primero la versión más grande disponible en el CDN de Behance
+    for (const u of urlPortada ? versionesPortada(urlPortada) : []) {
+      const intento = [];
+      miniatura = await bajar(u, slug, 'portada', tamanos, intento);
+      if (miniatura) break;
+      if (u === urlPortada) faltantes.push(...intento);
     }
     const stills = [];
     for (const [i, u] of datos.imagenes.entries()) {
+      if (cliente.bloqueado(new URL(u).host)) break;
       const ruta = await bajar(u, slug, `still-${String(i + 1).padStart(2, '0')}`, tamanos, faltantes);
       if (ruta) stills.push({ src: ruta, alt: '' });
     }
@@ -173,6 +193,9 @@ for (const item of lista.values()) {
       stills,
       cuerpo: unicos.slice(1).join('\n\n'),
     };
+    // Con solo el feed no se conoce la galería, el video ni las etiquetas: esos campos no se tocan
+    if (soloFeed) for (const campo of ['categorias', 'video', 'stills', 'cuerpo']) delete nuevo[campo];
+    if (soloFeed && !nuevo.sinopsis) delete nuevo.sinopsis;
 
     const { accion, conflictos } = escribirProyecto({
       carpetaProyecto: path.join(rutas.proyectos, slug),
@@ -192,7 +215,8 @@ for (const item of lista.values()) {
     if (!leido?.categorias?.length) pendientes.push('categoría');
     if (!leido?.video) pendientes.push('video');
     if (!nuevo.anio) pendientes.push('año');
-    if (!miniatura) pendientes.push('miniatura');
+    if (!miniatura && !leido?.miniatura) pendientes.push('miniatura');
+    if (soloFeed && !leido?.stills?.length) pendientes.push('galería de stills');
 
     informe.resultados.push({
       titulo,
@@ -200,6 +224,7 @@ for (const item of lista.values()) {
       accion,
       url: item.url,
       fuente: item.html ? 'página guardada' : datos.fuenteDatos,
+      soloFeed,
       imagenes: stills.length + (miniatura ? 1 : 0),
       videosExtra: datos.videos.slice(1),
       videosBehance: datos.videosBehance,
@@ -229,10 +254,35 @@ async function bajar(url, slug, nombre, tamanos, faltantes) {
     const buffer = await cliente.descargar(url);
     return await guardarImagen(buffer, { carpetaPublica: rutas.publica, slug, nombre, tamanos });
   } catch (e) {
-    if (e instanceof BloqueoError) throw e;
+    if (e instanceof BloqueoError && !informe.bloqueo) registrarError('Imágenes', e);
     faltantes.push(`${nombre}: ${e.message}`);
     return '';
   }
+}
+
+/** Datos mínimos de un proyecto a partir del feed RSS (cuando la página está bloqueada). */
+function datosDelFeed(item) {
+  return {
+    id: item.id,
+    url: item.url,
+    titulo: item.titulo,
+    descripcion: item.descripcion ?? '',
+    textos: [],
+    anio: item.anio,
+    etiquetas: [],
+    portada: item.portada,
+    imagenes: [],
+    videos: [],
+    videosBehance: 0,
+    fuenteDatos: 'feed RSS (página bloqueada)',
+  };
+}
+
+/** Variantes de una portada de Behance, de la más grande a la original del feed. */
+function versionesPortada(url) {
+  const m = url.match(/^(.*\/projects\/)([^/]+)(\/.+)$/);
+  if (!m) return [url];
+  return [...new Set(['original', 'max_808', m[2]].map((t) => m[1] + t + m[3]))];
 }
 
 function mapearEtiquetas(etiquetas) {
@@ -276,10 +326,11 @@ function leerFrontmatter(archivo) {
 function registrarError(donde, e) {
   if (e instanceof BloqueoError) {
     informe.bloqueo =
-      `${e.message} al leer ${e.url}. El importador se detuvo y no lo va a reintentar. ` +
-      'Alternativa: abrí cada proyecto en tu navegador, guardalo con Archivo → Guardar como (solo HTML) ' +
-      'dentro de la carpeta behance-paginas/ y volvé a correr el importador.';
-    console.log(`  ✕ ${donde}: ${e.message} — importación detenida`);
+      `${e.message} al leer ${e.url}. El importador no insistió con esas páginas: los proyectos se crearon ` +
+      'con lo que trae el feed (título, año, portada y descripción si la hay). Para sumar la galería y el video, ' +
+      'pegá el enlace de Vimeo/YouTube en cada archivo, o guardá la página del proyecto desde tu navegador ' +
+      '(Archivo → Guardar como, solo HTML) en la carpeta behance-paginas/ y corré: npm run importar:behance -- --sin-feed';
+    console.log(`  ! ${donde}: ${e.message}. Se sigue solo con los datos del feed.`);
   } else {
     informe.errores.push(`${donde}: ${e.message}`);
     console.log(`  ✕ ${donde}: ${e.message}`);

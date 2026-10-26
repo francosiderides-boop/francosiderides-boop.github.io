@@ -26,7 +26,10 @@ export function leerFeed(xml) {
       const $i = $(item);
       const link = $i.find('link').text().trim() || $i.find('guid').text().trim();
       const descripcionHtml = $i.find('description').text();
-      const portada = cheerio.load(descripcionHtml)('img').first().attr('src') ?? null;
+      const $d = cheerio.load(descripcionHtml);
+      const portada = $d('img').first().attr('src') ?? null;
+      $d('img, a:empty').remove();
+      const descripcion = limpiarTexto($d('body').html() ?? '');
       const fecha = new Date($i.find('pubDate').text().trim());
       return {
         id: idDesdeUrl(link),
@@ -34,6 +37,7 @@ export function leerFeed(xml) {
         titulo: $i.find('title').text().trim(),
         anio: Number.isNaN(fecha.getTime()) ? null : fecha.getFullYear(),
         portada,
+        descripcion,
       };
     })
     .filter((p) => p.id);

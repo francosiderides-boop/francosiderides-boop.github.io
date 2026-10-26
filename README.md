@@ -199,7 +199,7 @@ Podés correrlo las veces que quieras:
 ### Si faltan proyectos o Behance bloquea la lectura
 
 - **El feed puede no traer todos tus proyectos** (a veces muestra solo los más recientes). Abrí `behance-urls.txt`, pegá la dirección de cada proyecto que falte (una por línea) y volvé a correr el importador.
-- **Si Behance bloquea la lectura automática**, el importador se detiene y no insiste (no intenta saltearse bloqueos ni captchas). En ese caso:
+- **Si Behance bloquea las páginas de proyecto** (pasa seguido: responde "403"), el importador no insiste ni intenta saltearse el bloqueo. Igual crea cada proyecto con lo que trae el feed: título, año, portada y descripción. Después podés pegar el enlace de Vimeo o YouTube en el campo `video` de cada archivo. Para sumar también la galería de imágenes:
   1. Creá una carpeta llamada `behance-paginas` dentro de la carpeta del sitio.
   2. Abrí cada proyecto en tu navegador y guardalo con **Archivo → Guardar página como…**, formato **"Página web, solo HTML"**, dentro de esa carpeta.
   3. Corré `npm run importar:behance -- --sin-feed`.
