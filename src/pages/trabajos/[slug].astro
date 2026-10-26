@@ -34,6 +34,8 @@ const { Content } = await render(proyecto);
 const carpeta = carpetaDe(proyecto.filePath);
 const miniatura = datosImagen(data.miniatura).src;
 const hayOtros = anterior.id !== proyecto.id;
+// Solo se muestra la sección "Sinopsis" si hay texto
+const hayTexto = !!data.sinopsis || proyecto.body?.trim();
 const descripcion = data.sinopsis || `${data.titulo} (${data.anio}) — ${textoCategorias(proyecto)}.`;
 ---
 
@@ -73,7 +75,8 @@ const descripcion = data.sinopsis || `${data.titulo} (${data.anio}) — ${textoC
         )
       }
 
-      <div class="mt-12 grid grid-cols-1 gap-12 md:mt-14 lg:mt-20 lg:grid-cols-2 lg:gap-20">
+      <div class:list={['mt-12 grid grid-cols-1 gap-12 md:mt-14 lg:mt-20 lg:gap-20', hayTexto && 'lg:grid-cols-2']}>
+        {hayTexto && (
         <section aria-labelledby="titulo-sinopsis">
           <h2 id="titulo-sinopsis" class="mb-4 font-display text-[32px] font-semibold">Sinopsis</h2>
           {data.sinopsis && <p class="max-w-[560px] leading-relaxed text-muted md:text-[17px] lg:text-lg">{data.sinopsis}</p>}
@@ -81,6 +84,7 @@ const descripcion = data.sinopsis || `${data.titulo} (${data.anio}) — ${textoC
             <Content />
           </div>
         </section>
+        )}
         <FichaTecnica proyecto={proyecto} />
       </div>
 
