@@ -7,15 +7,16 @@ slug: "hijos-de-la-desdicha"
 anio: 2026
 categorias:
   - Ficción
-rol: "" # COMPLETAR (ej. Director · Editor)
+rol: "Dirección · Guion · Producción"
 cliente: "" # COMPLETAR
 duracion: "" # COMPLETAR (ej. 3:42 o 14 min)
 destacado: false
 publicado: true
 
-sinopsis: "Cortometraje de 7 segundos sobre las apuestas online en los menores."
+sinopsis: "Dirección, guion y producción del cortometraje llamado \"Hijos de la
+  desdicha\", que aborda la problemática de la ludopatía infantil."
 
-video: "" # COMPLETAR si hay video en Vimeo o YouTube
+video: "https://www.instagram.com/p/DDu3Y2hxuAF/"
 
 miniatura: "/proyectos/hijos-de-la-desdicha/portada.webp"
 stills: []

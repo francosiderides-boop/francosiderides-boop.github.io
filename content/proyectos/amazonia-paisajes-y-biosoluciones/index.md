@@ -15,7 +15,7 @@ publicado: true
 
 sinopsis: "Comercial para un emprendimiento de paisajismo y biosoluciones."
 
-video: "" # COMPLETAR si hay video en Vimeo o YouTube
+video: "https://www.instagram.com/p/DF6E5JMNK6K/"
 
 miniatura: "/proyectos/amazonia-paisajes-y-biosoluciones/portada.webp"
 stills: []

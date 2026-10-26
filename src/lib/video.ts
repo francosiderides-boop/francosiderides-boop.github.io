@@ -2,7 +2,7 @@
  * Convierte un enlace de YouTube o Vimeo en la dirección del reproductor embebido.
  * Usa las versiones que no dejan cookies de seguimiento.
  */
-export function urlEmbebida(url: string): { plataforma: 'YouTube' | 'Vimeo' | 'archivo'; src: string } | null {
+export function urlEmbebida(url: string): { plataforma: 'YouTube' | 'Vimeo' | 'Instagram' | 'archivo'; src: string } | null {
   if (!url) return null;
   // Archivo de video propio guardado en /public
   if (/^\/[^/].*\.(mp4|webm|mov)$/i.test(url)) return { plataforma: 'archivo', src: url };
@@ -21,6 +21,13 @@ export function urlEmbebida(url: string): { plataforma: 'YouTube' | 'Vimeo' | 'a
         : u.searchParams.get('v') || u.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/)?.[1];
     if (!id) return null;
     return { plataforma: 'YouTube', src: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0` };
+  }
+
+  if (host === 'instagram.com') {
+    // instagram.com/p/ID, /reel/ID o /tv/ID → reproductor embebido de Instagram
+    const m = u.pathname.match(/^\/(p|reel|tv)\/([\w-]+)/);
+    if (!m) return null;
+    return { plataforma: 'Instagram', src: `https://www.instagram.com/${m[1]}/${m[2]}/embed/` };
   }
 
   if (host.endsWith('vimeo.com')) {
