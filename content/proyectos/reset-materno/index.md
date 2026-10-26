@@ -2,8 +2,8 @@
 # Importado de Behance el 2026-10-26. Revisá los campos marcados con COMPLETAR.
 # Si volvés a importar, lo que cambies a mano en este archivo se respeta.
 
-titulo: "Realización de Reset Materno (temporadas 1 y 2)"
-slug: "realizacion-de-reset-materno-temporada-1-y-2"
+titulo: "Reset Materno"
+slug: "reset-materno"
 anio: 2026
 categorias:
   - Institucional
@@ -19,7 +19,7 @@ sinopsis: "Podcast sobre maternidad en el que madres influencers y profesionales
 
 video: "https://www.youtube.com/watch?v=SXk2AH3_wvQ"
 
-miniatura: "/proyectos/realizacion-de-reset-materno-temporada-1-y-2/portada.webp"
+miniatura: "/proyectos/reset-materno/portada.webp"
 stills: []
 
 ficha:
