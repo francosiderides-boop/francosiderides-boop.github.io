@@ -6,7 +6,7 @@ titulo: "Reset Materno"
 slug: "reset-materno"
 anio: 2026
 categorias:
-  - Institucional
+  - Comerciales
 rol: "Dirección audiovisual"
 cliente: "Protectia · La Voz del Interior"
 duracion: "" # COMPLETAR (ej. 3:42 o 14 min)

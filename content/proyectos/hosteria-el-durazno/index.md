@@ -6,7 +6,7 @@ titulo: "Hostería El Durazno"
 slug: "hosteria-el-durazno"
 anio: 2025
 categorias:
-  - Institucional
+  - Comerciales
 rol: "" # COMPLETAR (ej. Director · Editor)
 cliente: "" # COMPLETAR
 duracion: "1:07"
