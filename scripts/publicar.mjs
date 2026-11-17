@@ -44,9 +44,46 @@ if (!fs.existsSync(path.join(COPIA, '.git'))) {
   git(['reset', '-q', '--hard', 'origin/gh-pages']);
 }
 
-// Reemplaza el contenido por el sitio nuevo (sin tocar .git)
+// Reemplaza el contenido de la rama (sin tocar .git)
 for (const f of fs.readdirSync(COPIA)) if (f !== '.git') fs.rmSync(path.join(COPIA, f), { recursive: true, force: true });
-fs.cpSync(DIST, COPIA, { recursive: true });
+
+const sitio = JSON.parse(fs.readFileSync(path.join(RAIZ, 'config', 'sitio.json'), 'utf8'));
+const destino = new URL(sitio.url);
+if (destino.host.endsWith('.github.io')) {
+  // El sitio principal es GitHub Pages: se publica completo
+  fs.cpSync(DIST, COPIA, { recursive: true });
+} else {
+  // El sitio principal está en otro lado (Netlify): GitHub Pages solo guarda los videos,
+  // la verificación de la app (.well-known) y páginas que redirigen a la dirección nueva
+  const conservar = (rel) => rel.startsWith('.well-known') || /\.(mp4|webm|mov)$/i.test(rel) || rel === '.nojekyll';
+  const recorrer = (dir) =>
+    fs.readdirSync(path.join(DIST, dir), { withFileTypes: true }).flatMap((e) => {
+      const rel = path.posix.join(dir, e.name);
+      return e.isDirectory() ? recorrer(rel) : [rel];
+    });
+  for (const rel of recorrer('')) {
+    if (conservar(rel)) {
+      fs.mkdirSync(path.dirname(path.join(COPIA, rel)), { recursive: true });
+      fs.copyFileSync(path.join(DIST, rel), path.join(COPIA, rel));
+    } else if (rel.endsWith('.html')) {
+      const ruta = rel === '404.html' ? null : '/' + rel.replace(/index\.html$/, '');
+      fs.mkdirSync(path.dirname(path.join(COPIA, rel)), { recursive: true });
+      fs.writeFileSync(path.join(COPIA, rel), paginaRedireccion(destino, ruta));
+    }
+  }
+  fs.writeFileSync(path.join(COPIA, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${new URL('sitemap-index.xml', destino)}\n`);
+}
+
+/** Página mínima que manda a la misma sección en la dirección nueva (ruta null = la que pidió el visitante). */
+function paginaRedireccion(destino, ruta) {
+  const base = destino.origin;
+  const url = ruta ? base + ruta : base + '/';
+  const js = ruta ? `location.replace(${JSON.stringify(url)} + location.hash)` : `location.replace(${JSON.stringify(base)} + location.pathname + location.search + location.hash)`;
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Franco Gonzalez — nueva dirección</title>
+<link rel="canonical" href="${url}"><meta name="robots" content="noindex">
+${ruta ? `<meta http-equiv="refresh" content="0; url=${url}">` : ''}<script>${js}</script></head>
+<body style="font-family:system-ui;background:#0a0c0e;color:#eceff1;padding:2rem">El portfolio se mudó a <a style="color:#3fd0c0" href="${url}">${url}</a></body></html>\n`;
+}
 
 git(['add', '-A']);
 // GitHub Pages: sirve los videos (y la dirección vieja del sitio)
