@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Arma el sitio y lo sube a la rama gh-pages de GitHub, que es la que publica GitHub Pages.
+// Arma el sitio y lo publica: en GitHub Pages (rama gh-pages, que también sirve los videos)
+// y en Netlify (guardando los cambios en GitHub con la marca [publicar]).
 //   npm run publicar
 // Guarda una copia de esa rama en .publicar/ para subir solo lo que cambió (los videos no se vuelven a subir).
 import { execFileSync } from 'node:child_process';
@@ -48,11 +49,18 @@ for (const f of fs.readdirSync(COPIA)) if (f !== '.git') fs.rmSync(path.join(COP
 fs.cpSync(DIST, COPIA, { recursive: true });
 
 git(['add', '-A']);
-if (!leer('git', ['status', '--porcelain'], COPIA)) {
-  console.log('\nNo había cambios para publicar.\n');
-  process.exit(0);
+// GitHub Pages: sirve los videos (y la dirección vieja del sitio)
+if (leer('git', ['status', '--porcelain'], COPIA)) {
+  git(['commit', '-q', '-m', `Publicación ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`]);
+  git(['push', '-q', 'origin', 'gh-pages']);
 }
-git(['commit', '-q', '-m', `Publicación ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`]);
-git(['push', '-q', 'origin', 'gh-pages']);
+
+// Netlify: guarda los cambios del proyecto en GitHub con la marca [publicar],
+// que es la señal para que Netlify publique (ver netlify.toml)
+const fecha = new Date().toISOString().slice(0, 16).replace('T', ' ');
+const raiz = (args) => correr('git', ['-c', 'user.name=Franco Gonzalez', '-c', 'user.email=publicar@localhost', ...args]);
+raiz(['add', '-A']);
+raiz(['commit', '-q', '--allow-empty', '-m', `Cambios del sitio ${fecha} [publicar]`]);
+raiz(['push', '-q', 'origin', 'HEAD']);
 
 console.log('\n✓ Listo. En 1 o 2 minutos el sitio está actualizado.\n');

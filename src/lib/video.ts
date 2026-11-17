@@ -1,11 +1,17 @@
+import { sitio } from './sitio';
+
 /**
  * Convierte un enlace de YouTube o Vimeo en la dirección del reproductor embebido.
  * Usa las versiones que no dejan cookies de seguimiento.
  */
 export function urlEmbebida(url: string): { plataforma: 'YouTube' | 'Vimeo' | 'Instagram' | 'archivo'; src: string } | null {
   if (!url) return null;
-  // Archivo de video propio guardado en /public
-  if (/^\/[^/].*\.(mp4|webm|mov)$/i.test(url)) return { plataforma: 'archivo', src: url };
+  // Archivo de video propio guardado en /public. Si sitio.json tiene "videosDesde", se sirve
+  // desde esa dirección (GitHub Pages) para no gastar el tráfico del hosting principal.
+  if (/^\/[^/].*\.(mp4|webm|mov)$/i.test(url)) {
+    const base = (sitio as { videosDesde?: string }).videosDesde?.replace(/\/$/, '') ?? '';
+    return { plataforma: 'archivo', src: base + url };
+  }
   let u: URL;
   try {
     u = new URL(url);

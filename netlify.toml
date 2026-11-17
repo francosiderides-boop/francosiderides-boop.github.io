@@ -1,7 +1,10 @@
-# Configuración para Netlify (alternativa gratuita a GitHub Pages)
+# Configuración para Netlify.
+# Para no gastar créditos del plan gratis, Netlify solo publica cuando el último cambio
+# dice [publicar] (lo agrega solo el comando: npm run publicar).
 [build]
   command = "npm run build"
   publish = "dist"
+  ignore = "git log -1 --pretty=%B | grep -qF '[publicar]' && exit 1 || exit 0"
 
 [build.environment]
   NODE_VERSION = "24"
